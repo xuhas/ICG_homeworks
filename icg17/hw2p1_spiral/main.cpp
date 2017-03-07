@@ -22,9 +22,85 @@ void Init() {
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glm::mat4 model = IDENTITY_MATRIX;
-    // compute transformations here
-    triangle.Draw(model);
+    //Simple spiral ----> k = 0;
+    //Fermat spiral ----> k = 1;
+    /***************************************************/
+     int k=1;
+     /**************************************************/
+    //Simple spiral
+    if(k==0){
+
+   //Transformation
+
+
+  for(int i = 0 ; i<60; i++){
+
+      //scale
+      glm::mat3 S = glm::mat3(0.07*i/50);
+
+      //first rotation
+      glm::mat3 R1 = glm::mat3(1);
+      float a = glm::radians(float(25));
+      R1[0][0] =  cos(a*float(i));
+      R1[0][1] =  sin(a*float(i));
+      R1[1][0] = -sin(a*float(i));
+      R1[1][1] =  cos(a*float(i));
+
+      //second rotation
+      glm::mat3 R2 = glm::mat3(1);
+      float b = glm::radians(float(40));
+      R2[0][0] =  cos(b);
+      R2[0][1] =  sin(b);
+      R2[1][0] = -sin(b);
+      R2[1][1] =  cos(b);
+
+      // translation
+      glm::mat4 T = glm::mat4(1);
+      T[3][0] = .12*i;
+      T[3][1] = .12*i;
+      glm::mat4 model = glm::mat4(S)*glm::mat4(R1)*glm::mat4(T)*glm::mat4(R2);
+         // compute transformations here
+      triangle.Draw(model);
+
+         }
+    }
+
+    //Fermat spiral
+    if(k==1){
+        for(int i = -200 ; i<500; i++){
+
+            //scale
+            glm::mat3 S = glm::mat3(0.02);
+
+            //first rotation
+            glm::mat3 R1 = glm::mat3(1);
+            float a = glm::radians(137.508);
+            R1[0][0] =  cos(a*float(i));
+            R1[0][1] =  sin(a*float(i));
+            R1[1][0] = -sin(a*float(i));
+            R1[1][1] =  cos(a*float(i));
+
+            //second rotation
+            glm::mat3 R2 = glm::mat3(1);
+            float b = glm::radians(float(30));
+            R2[0][0] =  cos(b);
+            R2[0][1] =  sin(b);
+            R2[1][0] = -sin(b);
+            R2[1][1] =  cos(b);
+
+            // translation
+            double c= 1.3;
+            glm::mat4 T = glm::mat4(1);
+            T[3][0] = c*sqrt(double(i));
+            T[3][1] = c*sqrt(double(i));
+            glm::mat4 model = glm::mat4(S)*glm::mat4(R1)*glm::mat4(T)*glm::mat4(R2);
+               // compute transformations here
+            triangle.Draw(model);
+
+          }
+
+
+        }
 }
 
 void ErrorCallback(int error, const char* description) {
@@ -83,6 +159,7 @@ int main(int argc, char *argv[]) {
 
     // render loop
     while(!glfwWindowShouldClose(window)) {
+
         Display();
         glfwSwapBuffers(window);
         glfwPollEvents();
