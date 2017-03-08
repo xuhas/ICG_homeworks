@@ -10,15 +10,63 @@
 // Quad stuff1;
 // ...
 
+Quad sun;
+Quad earth;
+Quad moon;
+
 void Init() {
     // sets background color
     glClearColor(1.0,1.0,1.0 /*white*/, 1.0 /*solid*/);
+    sun.Init("sun.tga");
+    earth.Init("earth.tga");
+    moon.Init("moon.tga");
     // {stuff}.Init(...);
 }
 
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
-    float time_s = glfwGetTime();
+
+
+    //ACCELERATION
+    float acc = 0.5;
+
+    float time_s = acc * glfwGetTime();
+
+    //SUN EQUATIONS
+
+    glm::mat4 S = glm::scale(glm::mat4(1.0f), glm::vec3(0.15f, 0.15f, 0.05f));
+    glm::mat4 R = glm::rotate(glm::mat4(1.0f), time_s, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 T = glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, 0.0f, 0.0f));
+
+    glm::mat4 mat = T*R*S;
+    sun.Draw(mat);
+
+    //EARTH EQUATIONS
+
+    float a = 0.8;
+    float b = 0.5;
+    float x = a * cos(time_s);
+    float y = b * sin(time_s);
+
+    glm::mat4 S_earth = glm::scale(glm::mat4(1.0f), glm::vec3(0.07f, 0.07f, 0.0f));
+    glm::mat4 R_earth = glm::rotate(glm::mat4(1.0f), 3 * time_s, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 T_earth = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
+
+    glm::mat4 mat_earth = T_earth*R_earth*S_earth;
+    earth.Draw(mat_earth);
+
+    //MOON EQUATIONS
+
+    float u = 0.15 * cos(5 * time_s) + x;
+    float v = 0.15 * sin(5 * time_s) + y;
+
+    glm::mat4 S_moon = glm::scale(glm::mat4(1.0f), glm::vec3(0.04f, 0.04f, 0.0f));
+    glm::mat4 R_moon = glm::rotate(glm::mat4(1.0f), 4 * time_s, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 T_moon = glm::translate(glm::mat4(1.0f), glm::vec3(u, v, 0.0f));
+
+    glm::mat4 mat_moon = T_moon*R_moon*S_moon;
+    moon.Draw(mat_moon);
+
 
     // compute the transformation matrices
     // {stuff}.Draw({stuff}_modelmatrix);
