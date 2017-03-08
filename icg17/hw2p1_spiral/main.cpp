@@ -25,8 +25,10 @@ void Display() {
     //Simple spiral ----> k = 0;
     //Fermat spiral ----> k = 1;
     /***************************************************/
-     int k=1;
+     int k=0;
      /**************************************************/
+
+
     //Simple spiral
     if(k==0){
 
@@ -59,7 +61,8 @@ void Display() {
       T[3][0] = .12*i;
       T[3][1] = .12*i;
       glm::mat4 model = glm::mat4(S)*glm::mat4(R1)*glm::mat4(T)*glm::mat4(R2);
-         // compute transformations here
+
+      // compute transformations here
       triangle.Draw(model);
 
          }
@@ -94,7 +97,8 @@ void Display() {
             T[3][0] = c*sqrt(double(i));
             T[3][1] = c*sqrt(double(i));
             glm::mat4 model = glm::mat4(S)*glm::mat4(R1)*glm::mat4(T)*glm::mat4(R2);
-               // compute transformations here
+
+            // we draw the triangle with the modified model matrix
             triangle.Draw(model);
 
           }

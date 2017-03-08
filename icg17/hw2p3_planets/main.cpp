@@ -61,7 +61,7 @@ void Display() {
     float v = 0.15 * sin(5 * time_s) + y;
 
     glm::mat4 S_moon = glm::scale(glm::mat4(1.0f), glm::vec3(0.04f, 0.04f, 0.0f));
-    glm::mat4 R_moon = glm::rotate(glm::mat4(1.0f), 4 * time_s, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 R_moon = glm::rotate(glm::mat4(1.0f), -5 * time_s, glm::vec3(0.0f, 0.0f, 1.0f));
     glm::mat4 T_moon = glm::translate(glm::mat4(1.0f), glm::vec3(u, v, 0.0f));
 
     glm::mat4 mat_moon = T_moon*R_moon*S_moon;
