@@ -6,6 +6,7 @@
 #include "icg_helper.h"
 
 #include "quad/quad.h"
+#include <iostream>
 
 // Quad stuff1;
 // ...
@@ -13,6 +14,7 @@
 Quad sun;
 Quad earth;
 Quad moon;
+float speed=10;
 
 void Init() {
     // sets background color
@@ -20,66 +22,65 @@ void Init() {
     sun.Init("sun.tga");
     earth.Init("earth.tga");
     moon.Init("moon.tga");
-    // {stuff}.Init(...);
 }
 
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
-
-    //ACCELERATION
-    float acc = 0.5;
-
-    float time_s = acc * glfwGetTime();
+	float time_s = speed * glfwGetTime();
 
     //SUN EQUATIONS
-
-    glm::mat4 S = glm::scale(glm::mat4(1.0f), glm::vec3(0.15f, 0.15f, 0.05f));
-    glm::mat4 R = glm::rotate(glm::mat4(1.0f), time_s, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 S = glm::scale(glm::mat4(1.0f), glm::vec3(0.15f, 0.15f, 0.0f));
+	glm::mat4 R = glm::rotate(glm::mat4(1.0f), time_s/26, glm::vec3(0.0f, 0.0f, 1.0f));
     glm::mat4 T = glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, 0.0f, 0.0f));
 
     glm::mat4 mat = T*R*S;
     sun.Draw(mat);
 
     //EARTH EQUATIONS
-
     float a = 0.8;
     float b = 0.5;
-    float x = a * cos(time_s);
-    float y = b * sin(time_s);
+	float x = a * cos(time_s/365);
+	float y = -b * sin(time_s/365);
 
     glm::mat4 S_earth = glm::scale(glm::mat4(1.0f), glm::vec3(0.07f, 0.07f, 0.0f));
-    glm::mat4 R_earth = glm::rotate(glm::mat4(1.0f), 3 * time_s, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 R_earth = glm::rotate(glm::mat4(1.0f), time_s, glm::vec3(0.0f, 0.0f, 1.0f));
     glm::mat4 T_earth = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
 
     glm::mat4 mat_earth = T_earth*R_earth*S_earth;
     earth.Draw(mat_earth);
 
     //MOON EQUATIONS
-
-    float u = 0.15 * cos(5 * time_s) + x;
-    float v = 0.15 * sin(5 * time_s) + y;
+	float u = 0.15 * cos(time_s/28) + x;
+	float v = 0.15 * sin(time_s/28) + y;
 
     glm::mat4 S_moon = glm::scale(glm::mat4(1.0f), glm::vec3(0.04f, 0.04f, 0.0f));
-    glm::mat4 R_moon = glm::rotate(glm::mat4(1.0f), -5 * time_s, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 R_moon = glm::rotate(glm::mat4(1.0f), time_s/28, glm::vec3(0.0f, 0.0f, 1.0f));
     glm::mat4 T_moon = glm::translate(glm::mat4(1.0f), glm::vec3(u, v, 0.0f));
 
     glm::mat4 mat_moon = T_moon*R_moon*S_moon;
     moon.Draw(mat_moon);
-
-
-    // compute the transformation matrices
-    // {stuff}.Draw({stuff}_modelmatrix);
 }
 
 void ErrorCallback(int error, const char* description) {
     fputs(description, stderr);
 }
 
+//use up and down arrows to increase or decrase the speed
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
+	if ((key == GLFW_KEY_UP && action == GLFW_PRESS) || (key == GLFW_KEY_UP && action == GLFW_REPEAT)){
+		speed=speed+0.5;
+		std::cout << "Speed: " << speed << std::endl;
+	}
+	if ((key == GLFW_KEY_DOWN && action == GLFW_PRESS) || (key == GLFW_KEY_DOWN && action == GLFW_REPEAT)){
+		speed=speed-0.5;
+		if (speed<0.5)
+			speed=0.5;
+		std::cout << "Speed: " << speed << std::endl;
+	}
 }
 
 int main(int argc, char *argv[]) {
