@@ -33,6 +33,10 @@ public:
       // you might want to scale the rotation magnitude by a scalar factor.
       // p.s. No need for using complicated quaternions as suggested inthe wiki
       // article.
+	  vec3 rot_axis = cross(anchor_pos_, current_pos);
+	  float mag = length(rot_axis);
+	  rot_axis = normalize(rot_axis);
+	  rotation = rotate(rotation, mag/100, rot_axis);
       return rotation;
     }
 
@@ -44,6 +48,15 @@ private:
     // The trackball radius is given by 'radius_'.
     void ProjectOntoSurface(vec3& p) const {
       // TODO 2: Implement this function. Read above link for details.
+		float p_radius=sqrt(pow(p.x,2) + pow(p.y,2));
+		//check if the mouse is inside the sphere
+		if (p_radius <= radius_){
+			p.z = sqrt(pow(radius_,2) - (pow(p_radius,2)));
+		}
+		//if I'm outside the sphere I use an hyperbolic sheet
+		else{
+			p.z = (pow(radius_,2)/2) / (p_radius);
+		}
     }
 
     float radius_;

@@ -119,10 +119,10 @@ void Init() {
     // looks straight down the -z axis. Otherwise the trackball's rotation gets
     // applied in a rotated coordinate frame.
     // uncomment lower line to achieve this.
-    view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
-                         vec3(0.0f, 0.0f, 0.0f),
-                         vec3(0.0f, 1.0f, 0.0f));
-    // view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
+	//view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
+//                         vec3(0.0f, 0.0f, 0.0f),
+//                         vec3(0.0f, 1.0f, 0.0f));
+	view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
 
     trackball_matrix = IDENTITY_MATRIX;
 
@@ -180,7 +180,8 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // TODO 3: Calculate 'trackball_matrix' given the return value of
         // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
         // See also the mouse_button(...) function.
-        // trackball_matrix = ...
+		//trackball_matrix = ...
+		trackball_matrix = old_trackball_matrix - trackball.Drag(x, y);
     }
 
     // zoom
