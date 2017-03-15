@@ -181,7 +181,7 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
         // See also the mouse_button(...) function.
 		//trackball_matrix = ...
-		trackball_matrix = old_trackball_matrix - trackball.Drag(x, y);
+		trackball_matrix =  trackball.Drag(x, y) * old_trackball_matrix;
     }
 
     // zoom
