@@ -9,7 +9,6 @@
 
 #include "cube/cube.h"
 #include "grid/grid.h"
-
 #include "trackball.h"
 
 Cube cube;
@@ -122,6 +121,7 @@ void Init() {
 	//view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
 //                         vec3(0.0f, 0.0f, 0.0f),
 //                         vec3(0.0f, 1.0f, 0.0f));
+
 	view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
 
     trackball_matrix = IDENTITY_MATRIX;
@@ -181,7 +181,7 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
         // See also the mouse_button(...) function.
 		//trackball_matrix = ...
-		trackball_matrix =  trackball.Drag(x, y) * old_trackball_matrix;
+		trackball_matrix =  trackball.Drag(p.x, p.y) * old_trackball_matrix;
     }
 
     // zoom
@@ -271,7 +271,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    cout << "OpenGL" << glGetString(GL_VERSION) << endl;
+	cout << "OpenGL" << glGetString(GL_VERSION) << endl;
 
     // initialize our OpenGL program
     Init();

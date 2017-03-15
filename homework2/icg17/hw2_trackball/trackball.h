@@ -13,7 +13,7 @@ public:
     // is the top right corner.
     void BeingDrag(float x, float y) {
       anchor_pos_ = vec3(x, y, 0.0f);
-      ProjectOntoSurface(anchor_pos_);
+	  ProjectOntoSurface(anchor_pos_);
     }
 
     // this function is called while the user moves the curser around while the
@@ -33,10 +33,11 @@ public:
       // you might want to scale the rotation magnitude by a scalar factor.
       // p.s. No need for using complicated quaternions as suggested inthe wiki
       // article.
+	  float sensitivity = 1.0f;
 	  vec3 rot_axis = cross(anchor_pos_, current_pos);
 	  float mag = length(rot_axis);
 	  rot_axis = normalize(rot_axis);
-	  rotation = rotate(rotation, mag/100, rot_axis);
+	  rotation = rotate(rotation, mag*sensitivity, rot_axis);
       return rotation;
     }
 
