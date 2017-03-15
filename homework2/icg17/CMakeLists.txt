@@ -11,3 +11,6 @@ include(common/icg_settings.cmake)
 add_subdirectory(hw2p1_spiral)
 add_subdirectory(hw2p2_checkerboard)
 add_subdirectory(hw2p3_planets)
+
+#week 3
+add_subdirectory(hw2_trackball)
