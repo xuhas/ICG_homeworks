@@ -16,7 +16,7 @@ float speed = 300;
     // plane.
     // TODO 6: animate the height of the grid points as a sine function of the
     // 'time' and the position ('uv') within the grid.
-    float height = sin(radians(uv[0]/10)*time*speed)*sin(radians(uv[1]/10)*time*speed)/5;
+    float height = sin(radians(uv[0]/10)*time*speed)*sin(radians(uv[1]/10)*time*speed)/5+sin(radians(uv[1]/10+1)*time*speed)/5;
     vec3 pos_3d = vec3(position.x, height, -position.y);
 
     gl_Position = MVP * vec4(pos_3d, 1.0);

@@ -118,7 +118,7 @@ void Init() {
     // looks straight down the -z axis. Otherwise the trackball's rotation gets
     // applied in a rotated coordinate frame.
     // uncomment lower line to achieve this.
-	//view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
+    //view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
 //                         vec3(0.0f, 0.0f, 0.0f),
 //                         vec3(0.0f, 1.0f, 0.0f));
 
