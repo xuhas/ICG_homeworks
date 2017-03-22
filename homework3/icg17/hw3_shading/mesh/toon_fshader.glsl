@@ -13,7 +13,7 @@ uniform sampler1D tex1D;
 out vec3 color;
 
 void main() {
-    color = vec3(0.0,0.0,0.0);
+   // color = vec3(0.0,0.0,0.0);
 
     ///>>>>>>>>>> TODO >>>>>>>>>>>
     /// TODO 2.2: Toon shading.
@@ -32,5 +32,5 @@ void main() {
     vec3 r = reflect(-l,n);
     float pow = pow(max(dot(r,v), 0.0f), alpha);
     vec3 color_rv = texture(tex1D, pow).rgb;
-    color += Ls*ks*color_rv;
+    color += Ls*ks*color_rv*100;
 }

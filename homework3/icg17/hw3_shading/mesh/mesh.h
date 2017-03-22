@@ -112,6 +112,7 @@ class Mesh : public Material, public Light {
             // TODO 2.1 bind texture_1d_id_ for toon shading
             glBindTexture(GL_TEXTURE_1D ,texture_1d_id_);
             // TODO 3.1 bind texture_2d_id_ for artistic shading
+            glBindTexture(GL_TEXTURE_2D ,texture_2d_id_);
         }
 
         void UnbindShader(GLuint program_id) {
@@ -184,7 +185,7 @@ class Mesh : public Material, public Light {
             glGenTextures(1, &texture_1d_id_);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_1D, texture_1d_id_);
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RED, NB_COLOR, 0, GL_RED, GL_FLOAT, tex);
+            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, NB_COLOR, 0, GL_RED, GL_FLOAT, tex);
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameterf( GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
