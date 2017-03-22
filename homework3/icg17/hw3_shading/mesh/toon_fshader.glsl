@@ -27,5 +27,5 @@ void main() {
     vec3 v = normalize(view_dir);
     vec3 r = reflect(-l,n);
     vec3 color_rv = texture(tex1D, max(dot(r,v), 0.0f)).rgb;
-    color += color_rv*100;
+    color += color_rv;
 }
