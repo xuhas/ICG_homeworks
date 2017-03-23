@@ -29,14 +29,14 @@ void main() {
     // implementing Phong shading.
     //<<<<<<<<<< TODO <<<<<<<<<<<
 
-    color += La*ka;
+    color += La*ka;//ambient term
     vec3 n = normalize(normal_mv);
     vec3 l = normalize(light_dir);
     float lambert = dot(n,l);
-    if(lambert > 0.0) {
-        color += Ld*kd*lambert;
+    if(lambert > 0.0) {//insuring that its not hidden
+        color += Ld*kd*lambert;//diffuse term
         vec3 v = normalize(view_dir);
         vec3 r = reflect(-l,n);
-        color += Ls*ks*pow(max(dot(r,v), 0.0), alpha);
+        color += Ls*ks*pow(max(dot(r,v), 0.0), alpha);//specular term
     }
 }

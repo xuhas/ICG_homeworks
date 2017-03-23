@@ -20,4 +20,6 @@ void main() {
     // 1) compute the light direction light_dir.
     // 2) compute the view direction view_dir.
     //<<<<<<<<<< TODO <<<<<<<<<<<
+    light_dir = light_pos - vpoint_mv.xyz;
+    view_dir = -vpoint_mv.xyz;
 }
