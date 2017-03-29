@@ -1,5 +1,6 @@
 #pragma once
 #include "icg_helper.h"
+#include <iostream>
 
 class ScreenQuad {
 
@@ -12,9 +13,14 @@ class ScreenQuad {
         float screenquad_width_;
         float screenquad_height_;
 
+		float sigma_ = 1; //variance of the filter
+		int size_ = 7;
+		float kernel[100];
     public:
         void Init(float screenquad_width, float screenquad_height,
                   GLuint texture) {
+			//update gaussian filter
+			update_filter();
 
             // set screenquad size
             this->screenquad_width_ = screenquad_width;
@@ -104,6 +110,13 @@ class ScreenQuad {
             glUseProgram(program_id_);
             glBindVertexArray(vertex_array_id_);
 
+			//gaussian filter uniform
+			glUniform1fv(glGetUniformLocation(program_id_, "kernel"),
+			             size_,
+			             this->kernel);
+			glUniform1i(glGetUniformLocation(program_id_, "size"),
+			             this->size_);
+
             // window size uniforms
             glUniform1f(glGetUniformLocation(program_id_, "tex_width"),
                         this->screenquad_width_);
@@ -120,4 +133,32 @@ class ScreenQuad {
             glBindVertexArray(0);
             glUseProgram(0);
         }
+
+		//increase sigma of 0.25
+		void increase_var(){
+			sigma_ = sigma_ + 0.25;
+			std::cout << "sigma increased: " << sigma_ << std::endl;
+			if (sigma_ > 16) //upper bound 16 otherwise we go out of bound in the array
+				sigma_ = 16;
+			update_filter();
+		}
+
+		//decrease sigma of 0.25
+		void decrease_var(){
+			sigma_ = sigma_ - 0.25;
+			if (sigma_ < 0.3) //lower bound 0.3
+				sigma_ = 0.3;
+			std::cout << "sigma decreased: " << sigma_ << std::endl;
+			update_filter();
+		}
+
+		void update_filter(){
+			size_ = 1 + 2 * 3 * int(ceil(sigma_));
+			int center = (size_-1)/2;
+			for (int i = 0; i < size_; i++){
+				kernel[i] = exp( - pow(i-center, 2.0) / (2 * sigma_ * sigma_))
+				        / (2 * M_PI * sigma_ * sigma_);
+				std::cout << " " << kernel[i] << std::endl;
+			}
+		}
 };

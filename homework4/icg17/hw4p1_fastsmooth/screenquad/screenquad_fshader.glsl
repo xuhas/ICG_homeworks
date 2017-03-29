@@ -7,6 +7,8 @@ out vec3 color;
 uniform sampler2D tex;
 uniform float tex_width;
 uniform float tex_height;
+uniform float kernel[100];
+uniform int size;
 
 float rgb_2_luma(vec3 c) {
     return 0.3*c[0] + 0.59*c[1] + 0.11*c[2];
@@ -14,6 +16,7 @@ float rgb_2_luma(vec3 c) {
 
 void main() {
 #if 0
+	//THIS PART IS FOR EDGE DETECTION, IT WON'T BE COMPILED, ONLY A REFERENCE
     // x=-1
     float t_00 = rgb_2_luma( textureOffset(tex, uv, ivec2(-1, -1)).rgb );
     float t_01 = rgb_2_luma( textureOffset(tex, uv, ivec2(-1,  0)).rgb );
@@ -36,21 +39,25 @@ void main() {
     // color = abs( vec3(sy, sy, sy) ); ///< derivatives y
     color = vec3(g, g, g);
 #else
-    // gaussian convolution
-    float std = 2; // standard deviation (<.3 disable)
-    // float std = .1; // standard deviation (<.3 disable)
-    vec3 color_tot = vec3(0,0,0);
-    float weight_tot = 0;
-    int SIZE = 1 + 2 * 3 * int(ceil(std));
-    for(int i=-SIZE; i<=SIZE; i++){
-        for(int j=-SIZE; j<=SIZE; j++){
-            float w = exp(-(i*i+j*j)/(2.0*std*std*std*std));
-            vec3 neigh_color = texture(tex, uv+vec2(i/tex_width,j/tex_height)).rgb;
-            color_tot += w * neigh_color; 
-            weight_tot += w;
-        }
-    }
-    color = color_tot / weight_tot; // ensure \int w = 1
+	vec3 color_tot = vec3(0,0,0);
+	//ALONG X
+	float weight_tot = 0;
+	int start = (size - 1) / 2; //size is always odd
+	for(int i=-start; i<=start; i++){
+		vec3 neigh_color = texture(tex, uv+vec2(i/tex_width,0)).rgb;
+		color_tot += kernel[i+start] * neigh_color;
+		weight_tot += kernel[i+start];
+	}
+	color = color_tot;// / weight_tot;
+
+	//ALONG Y
+	//weight_tot = 0;
+	for(int j=-start; j<=start; j++){
+		vec3 neigh_color = texture(tex, uv+vec2(0,j/tex_height)).rgb;
+		color_tot += kernel[j+start] * neigh_color;
+		weight_tot += kernel[j+start];
+	}
+	color += color_tot / weight_tot;
 #endif
 }
 

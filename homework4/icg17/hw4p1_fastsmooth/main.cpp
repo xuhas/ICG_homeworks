@@ -95,7 +95,18 @@ void ErrorCallback(int error, const char* description) {
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
-    }
+	}
+
+	//add Q and W keys to control variance
+	//Q DECREASE
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+		screenquad.decrease_var();
+	}
+
+	//W INCREASE
+	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+		screenquad.increase_var();
+	}
 }
 
 int main(int argc, char *argv[]) {
