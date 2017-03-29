@@ -17,6 +17,7 @@ FrameBuffer framebuffer;
 Cube cube;
 Floor shinyfloor;
 
+
 using namespace glm;
 
 mat4 projection_matrix;
@@ -31,8 +32,10 @@ void Init(GLFWwindow* window) {
 
     cube.Init();
     // TODO: initialize framebuffer
+    GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
     // TODO: initialize shinyfloor with the FB texture
-    shinyfloor.Init(/*???*/);
+    //shinyfloor.Init(window_width, window_height, framebuffer_texture_id);
+    shinyfloor.Init(framebuffer_texture_id);
 }
 
 void Display() {
@@ -45,13 +48,30 @@ void Display() {
     mat4 view = lookAt(cam_pos, cam_look, cam_up);
     mat4 view_projection = projection_matrix * view;
 
+
+
     // TODO: mirror the camera position
+    vec3 mirror_cam_pos(2.0f, 1.0f,1.0f);
     // TODO: create new VP for mirrored camera
+    mat4 mirror_view = lookAt(mirror_cam_pos, cam_look, cam_up);
+    mat4 mirror_view_projection = projection_matrix*mirror_view;
     // TODO: render the cube using the mirrored camera
     // HINT: this render will be done in the framebuffer texture (remember bind/unbind)
-    
-    shinyfloor.Draw(view_projection);
+
+    framebuffer.Bind();
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        //cube.Draw(view_projection);
+        shinyfloor.Draw(view_projection);
+        cube.Draw(mirror_view_projection);
+
+    framebuffer.Unbind();
+
     cube.Draw(view_projection);
+    shinyfloor.Draw(view_projection);
+
+
+
+
 }
 
 // Gets called when the windows/framebuffer is resized.
