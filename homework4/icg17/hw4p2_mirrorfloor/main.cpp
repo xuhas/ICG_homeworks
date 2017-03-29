@@ -48,25 +48,31 @@ void Display() {
     mat4 view = lookAt(cam_pos, cam_look, cam_up);
     mat4 view_projection = projection_matrix * view;
 
+    //a matric to do the reflexion
+    mat4 ref = mat4(0);
+    ref[0][0] =-1;
+    ref[1][1] =1;
+    ref[2][2] = 1;
+    ref[3][3] = 1;
 
 
     // TODO: mirror the camera position
-    vec3 mirror_cam_pos(2.0f, 1.0f,1.0f);
+    vec3 mirror_cam_pos(-2.0f, 2.0f,-2.0f);
     // TODO: create new VP for mirrored camera
-    mat4 mirror_view = lookAt(mirror_cam_pos, cam_look, cam_up);
-    mat4 mirror_view_projection = projection_matrix*mirror_view;
+    mat4 mirror_view = lookAt(mirror_cam_pos, cam_look, -cam_up);
+    mat4 mirror_view_projection = projection_matrix*mirror_view*ref;
     // TODO: render the cube using the mirrored camera
     // HINT: this render will be done in the framebuffer texture (remember bind/unbind)
 
+    //bind the two textures
     framebuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-        //cube.Draw(view_projection);
-        shinyfloor.Draw(view_projection);
         cube.Draw(mirror_view_projection);
-
+        shinyfloor.Draw(view_projection);
     framebuffer.Unbind();
-
+    //draw the real cube
     cube.Draw(view_projection);
+    //draw the binded texture of the shinyfloor
     shinyfloor.Draw(view_projection);
 
 

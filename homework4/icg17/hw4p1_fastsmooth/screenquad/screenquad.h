@@ -156,8 +156,8 @@ class ScreenQuad {
 			size_ = 1 + 2 * 3 * int(ceil(sigma_));
 			int center = (size_-1)/2;
 			for (int i = 0; i < size_; i++){
-				kernel[i] = exp( - pow(i-center, 2.0) / (2 * sigma_ * sigma_))
-				        / (2 * M_PI * sigma_ * sigma_);
+//				kernel[i] = exp( - pow(i-center, 2.0) / (2 * sigma_ * sigma_))
+//				        / (2 * M_PI * sigma_ * sigma_);
 				std::cout << " " << kernel[i] << std::endl;
 			}
 		}
