@@ -99,7 +99,7 @@ float fbm(vec2 x) {
 
 
 void main() {
-float speed = 1;
+float speed = 0.5;
 
     uv = (position + vec2(1.0, 1.0)) * 5;
 
@@ -109,7 +109,10 @@ float speed = 1;
     // 'time' and the position ('uv') within the grid.
     //float height = sin(radians((10*(uv[0]+uv[1]))+time)*speed)/10;
 
-    float height = fbm(uv+time*speed)/3 ;
+    height = fbm(uv/3+time*speed) ;
+
+
+    if(height<0.05){height=0.05;}
     vec3 pos_3d = vec3(position.x, -position.y, height);
 
     gl_Position = MVP * vec4(pos_3d, 1.0);
