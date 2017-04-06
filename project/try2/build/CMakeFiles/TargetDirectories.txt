@@ -1,7 +1,0 @@
-C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/try2/build/CMakeFiles/common_headers.dir
-C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/try2/build/CMakeFiles/edit_cache.dir
-C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/try2/build/CMakeFiles/rebuild_cache.dir
-C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/try2/build/hw4p2_mirrorfloor/CMakeFiles/hw4p2_mirrorfloor.dir
-C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/try2/build/hw4p2_mirrorfloor/CMakeFiles/copy_shaders_hw4p2_mirrorfloor.dir
-C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/try2/build/hw4p2_mirrorfloor/CMakeFiles/edit_cache.dir
-C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/try2/build/hw4p2_mirrorfloor/CMakeFiles/rebuild_cache.dir
