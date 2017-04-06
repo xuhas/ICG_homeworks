@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="icg17"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="msvc8"/>
+		<Option virtualFolders="CMake Files\;CMake Files\common\;CMake Files\hw3_shading\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 all"/>
+					<CompileFile command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="common_headers">
+				<Option working_dir="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 common_headers"/>
+					<CompileFile command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 edit_cache"/>
+					<CompileFile command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/build"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\Makefile&quot; VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="copy_shaders_hw3_shading">
+				<Option working_dir="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/build/hw3_shading"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 copy_shaders_hw3_shading"/>
+					<CompileFile command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="hw3_shading">
+				<Option output="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/build/hw3_shading/hw3_shading.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/build/hw3_shading"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DGLEW_STATIC"/>
+					<Add option="-DGLM_FORCE_RADIANS"/>
+					<Add directory="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/external/glfw3/x32/include"/>
+					<Add directory="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/external/glew/include"/>
+					<Add directory="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/external"/>
+					<Add directory="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/common"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\8.1\include\\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\8.1\include\\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\8.1\include\\winrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 hw3_shading"/>
+					<CompileFile command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="hw3_shading/fast">
+				<Option output="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/build/hw3_shading/hw3_shading.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/build/hw3_shading"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DGLEW_STATIC"/>
+					<Add option="-DGLM_FORCE_RADIANS"/>
+					<Add directory="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/external/glfw3/x32/include"/>
+					<Add directory="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/external/glew/include"/>
+					<Add directory="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/external"/>
+					<Add directory="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/common"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\8.1\include\\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\8.1\include\\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\8.1\include\\winrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 hw3_shading/fast"/>
+					<CompileFile command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f &quot;C:\Users\Xhulio Hasani\Desktop\EPFL\Introduction du computer graphics\teamwork git\homework3\build\hw3_shading\Makefile&quot; VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/common/check_error_gl.h">
+			<Option target="common_headers"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/common/icg_helper.h">
+			<Option target="common_headers"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/common/stb_image.h">
+			<Option target="common_headers"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/common/tiny_obj_loader.h">
+			<Option target="common_headers"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/main.cpp">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/art_fshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/art_vshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/flat_fshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/flat_vshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/gouraud_fshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/gouraud_vshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/mesh.h">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/mesh_fshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/mesh_vshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/phong_fshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/phong_vshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/spot_fshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/spot_vshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/texture.h">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/toon_fshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/mesh/toon_vshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/quad/quad.h">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/quad/quad_fshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/quad/quad_vshader.glsl">
+			<Option target="hw3_shading"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/common/icg_settings.cmake">
+			<Option virtualFolder="CMake Files\common\"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/common/FindGLFW3.cmake">
+			<Option virtualFolder="CMake Files\common\"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/common/FindGLEW.cmake">
+			<Option virtualFolder="CMake Files\common\"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/common/FindGLM.cmake">
+			<Option virtualFolder="CMake Files\common\"/>
+		</Unit>
+		<Unit filename="C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework3/icg17/hw3_shading/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\hw3_shading\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

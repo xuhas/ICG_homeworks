@@ -1,0 +1,15 @@
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/CMakeFiles/common_headers.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/CMakeFiles/edit_cache.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/CMakeFiles/rebuild_cache.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p1_fastsmooth/CMakeFiles/copy_shaders_hw4p1_fastsmooth.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p1_fastsmooth/CMakeFiles/hw4p1_fastsmooth.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p1_fastsmooth/CMakeFiles/edit_cache.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p1_fastsmooth/CMakeFiles/rebuild_cache.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p2_mirrorfloor/CMakeFiles/hw4p2_mirrorfloor.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p2_mirrorfloor/CMakeFiles/copy_shaders_hw4p2_mirrorfloor.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p2_mirrorfloor/CMakeFiles/edit_cache.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p2_mirrorfloor/CMakeFiles/rebuild_cache.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p3_motionblur/CMakeFiles/hw4p3_motionblur.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p3_motionblur/CMakeFiles/copy_shaders_hw4p3_motionblur.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p3_motionblur/CMakeFiles/edit_cache.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/teamwork git/homework4/build/hw4p3_motionblur/CMakeFiles/rebuild_cache.dir

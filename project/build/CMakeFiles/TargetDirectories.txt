@@ -1,0 +1,7 @@
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/build/CMakeFiles/common_headers.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/build/CMakeFiles/edit_cache.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/build/CMakeFiles/rebuild_cache.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/build/hw2_trackball/CMakeFiles/edit_cache.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/build/hw2_trackball/CMakeFiles/copy_shaders_hw2_trackball.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/build/hw2_trackball/CMakeFiles/hw2_trackball.dir
+C:/Users/Xhulio Hasani/Desktop/EPFL/Introduction du computer graphics/project/build/hw2_trackball/CMakeFiles/rebuild_cache.dir
