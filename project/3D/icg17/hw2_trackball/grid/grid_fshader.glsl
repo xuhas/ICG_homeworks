@@ -10,8 +10,8 @@ void main() {
      vec3 col_white= vec3(1,1,1);
      vec3 col_black= vec3(0,0,0);
 
-  if(height==0.05){color = vec3(0.0,0.0,1.0);}
+  if(height<=0.15){color = vec3(0.0,0.0,1.0);}
   else if(height>0.5){color = vec3(1.0,1.0,1.0);}
-  else{color = vec3(0.1, 0.8, 0.2);}
+  else{color = vec3(0.3, 0.6, 0.3);}
 
 }

@@ -90,10 +90,10 @@ float fbm(vec2 x) {
                 v += a * noise(x);
                 x = rot * x * 2.0 + shift;
                 a *= 0.5;
+
         }
         return v;
 }
-
 
 
 
@@ -109,11 +109,15 @@ float speed = 0.5;
     // 'time' and the position ('uv') within the grid.
     //float height = sin(radians((10*(uv[0]+uv[1]))+time)*speed)/10;
 
-    height = fbm(uv/3+time*speed) ;
+    height = fbm(uv/3) ;
+    vec3 pos_3d = vec3(0.0,0.0,0.0);
 
-
-    if(height<0.05){height=0.05;}
-    vec3 pos_3d = vec3(position.x, -position.y, height);
+    if(height<0.15){
+         pos_3d = vec3(position.x, -position.y, 0.15+fbm(uv*2+time*speed/50)/100);//adjust inside fbm for movement of water
+    }
+    else{
+         pos_3d = vec3(position.x, -position.y,height);//generation of the terrain
+    }
 
     gl_Position = MVP * vec4(pos_3d, 1.0);
 }
