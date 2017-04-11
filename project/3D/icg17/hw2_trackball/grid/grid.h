@@ -31,35 +31,77 @@ class Grid {
             // vertex coordinates and indices
             {
                 std::vector<GLfloat> vertices;
-                std::vector<GLuint> indices;
-                // TODO 5: make a triangle grid with dimension 100x100.
-                // always two subsequent entries in 'vertices' form a 2D vertex position.
-                int grid_dim = 100;
+				std::vector<GLuint> indices;
 
-                // the given code below are the vertices for a simple quad.
-                // your grid should have the same dimension as that quad, i.e.,
-                // reach from [-1, -1] to [1, 1].
+				int grid_dim = 256;
+				float min_pos = -1.0;
+				float pos_range = 2.0;
 
-                int k=0;
-                float i = -1.0f;
-                for(float j = 1.0f ; j>= -1.0f ; j-=0.01f){
+				int xLength = grid_dim;
+				int yLength = grid_dim;
 
-                    for( i = -1.0f ; i <= 1.0f ; i+=0.01f){
-                        vertices.push_back(i); vertices.push_back( j);
-                        vertices.push_back( i); vertices.push_back(j - 0.01f);
-                        vertices.push_back( i + 0.01f); vertices.push_back( j);
-                        vertices.push_back(i-0.01f); vertices.push_back(j-0.01f);
+				int offset = 0;
 
-                        indices.push_back(k);
-                        indices.push_back(k+1);
-                        indices.push_back(k+2);
-                        indices.push_back(k+3);
+				// First, build the data for the vertex buffer
+				for (int y = 0; y < yLength; y++) {
+					for (int x = 0; x < xLength; x++) {
+						float xRatio = x / (float) (xLength - 1);
 
-                        k+=4;
+						// Build our heightmap from the top down, so that our triangles are
+						// counter-clockwise.
+						float yRatio = 1.0f - (y / (float) (yLength - 1));
 
-                    }
-                   //vertices.last()=; vertices.push_back(j-0.01f);
-                }
+						vertices.push_back(min_pos + (xRatio * pos_range));
+						vertices.push_back(min_pos + (yRatio * pos_range));
+					}
+				}
+
+				// Now build the index data
+				int numStripsRequired = yLength - 1;
+				int numDegensRequired = 2 * (numStripsRequired - 1);
+				int verticesPerStrip = 2 * xLength;
+
+				offset = 0;
+
+				for (int y = 0; y < yLength - 1; y++) {
+					if (y > 0) {
+						// Degenerate begin: repeat first vertex
+						indices.push_back(y * yLength);
+					}
+
+					for (int x = 0; x < xLength; x++) {
+						// One part of the strip
+						indices.push_back((y * yLength) + x);
+						indices.push_back(((y + 1) * yLength) + x);
+					}
+
+					if (y < yLength - 2) {
+						// Degenerate end: repeat last vertex
+						indices.push_back(((y + 1) * yLength) + (xLength - 1));
+					}
+				}
+
+
+//                int k=0;
+//                float i = -1.0f;
+//                for(float j = 1.0f ; j>= -1.0f ; j-=0.01f){
+
+//                    for( i = -1.0f ; i <= 1.0f ; i+=0.01f){
+//                        vertices.push_back(i); vertices.push_back( j);
+//                        vertices.push_back( i); vertices.push_back(j - 0.01f);
+//                        vertices.push_back( i + 0.01f); vertices.push_back( j);
+//                        vertices.push_back(i-0.01f); vertices.push_back(j-0.01f);
+
+//                        indices.push_back(k);
+//                        indices.push_back(k+1);
+//                        indices.push_back(k+2);
+//                        indices.push_back(k+3);
+
+//                        k+=4;
+
+//                    }
+//                   //vertices.last()=; vertices.push_back(j-0.01f);
+//                }
 
 
                 num_indices_ = indices.size();
