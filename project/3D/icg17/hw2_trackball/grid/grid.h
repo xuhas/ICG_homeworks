@@ -33,76 +33,78 @@ class Grid {
                 std::vector<GLfloat> vertices;
 				std::vector<GLuint> indices;
 
-				int grid_dim = 256;
-				float min_pos = -1.0;
-				float pos_range = 2.0;
+				bool use_new = true;
 
-				int xLength = grid_dim;
-				int yLength = grid_dim;
+				if (use_new){ //use new grid
+					int grid_dim = 512;
+					float min_pos = -1.0;
+					float pos_range = 2.0;
 
-				int offset = 0;
+					int xLength = grid_dim;
+					int yLength = grid_dim;
 
-				// First, build the data for the vertex buffer
-				for (int y = 0; y < yLength; y++) {
-					for (int x = 0; x < xLength; x++) {
-						float xRatio = x / (float) (xLength - 1);
+					int offset = 0;
 
-						// Build our heightmap from the top down, so that our triangles are
-						// counter-clockwise.
-						float yRatio = 1.0f - (y / (float) (yLength - 1));
+					// First, build the data for the vertex buffer
+					for (int y = 0; y < yLength; y++) {
+						for (int x = 0; x < xLength; x++) {
+							float xRatio = x / (float) (xLength - 1);
 
-						vertices.push_back(min_pos + (xRatio * pos_range));
-						vertices.push_back(min_pos + (yRatio * pos_range));
+							// Build our heightmap from the top down, so that our triangles are
+							// counter-clockwise.
+							float yRatio = 1.0f - (y / (float) (yLength - 1));
+
+							vertices.push_back(min_pos + (xRatio * pos_range));
+							vertices.push_back(min_pos + (yRatio * pos_range));
+						}
+					}
+
+					// Now build the index data
+					int numStripsRequired = yLength - 1;
+					int numDegensRequired = 2 * (numStripsRequired - 1);
+
+					offset = 0;
+
+					for (int y = 0; y < yLength - 1; y++) {
+						if (y > 0) {
+							// Degenerate begin: repeat first vertex
+							indices.push_back(y * yLength);
+						}
+
+						for (int x = 0; x < xLength; x++) {
+							// One part of the strip
+							indices.push_back((y * yLength) + x);
+							indices.push_back(((y + 1) * yLength) + x);
+						}
+
+						if (y < yLength - 2) {
+							// Degenerate end: repeat last vertex
+							indices.push_back(((y + 1) * yLength) + (xLength - 1));
+						}
 					}
 				}
+				else{ //else use old grid
+					int k=0;
+					float i = -1.0f;
+					for(float j = 1.0f ; j>= -1.0f ; j-=0.01f){
 
-				// Now build the index data
-				int numStripsRequired = yLength - 1;
-				int numDegensRequired = 2 * (numStripsRequired - 1);
-				int verticesPerStrip = 2 * xLength;
+						for( i = -1.0f ; i <= 1.0f ; i+=0.01f){
+							vertices.push_back(i); vertices.push_back( j);
+							vertices.push_back( i); vertices.push_back(j - 0.01f);
+							vertices.push_back( i + 0.01f); vertices.push_back( j);
+							vertices.push_back(i-0.01f); vertices.push_back(j-0.01f);
 
-				offset = 0;
+							indices.push_back(k);
+							indices.push_back(k+1);
+							indices.push_back(k+2);
+							indices.push_back(k+3);
 
-				for (int y = 0; y < yLength - 1; y++) {
-					if (y > 0) {
-						// Degenerate begin: repeat first vertex
-						indices.push_back(y * yLength);
-					}
+							k+=4;
 
-					for (int x = 0; x < xLength; x++) {
-						// One part of the strip
-						indices.push_back((y * yLength) + x);
-						indices.push_back(((y + 1) * yLength) + x);
-					}
-
-					if (y < yLength - 2) {
-						// Degenerate end: repeat last vertex
-						indices.push_back(((y + 1) * yLength) + (xLength - 1));
+						}
+						//vertices.last()=; vertices.push_back(j-0.01f);
 					}
 				}
-
-
-//                int k=0;
-//                float i = -1.0f;
-//                for(float j = 1.0f ; j>= -1.0f ; j-=0.01f){
-
-//                    for( i = -1.0f ; i <= 1.0f ; i+=0.01f){
-//                        vertices.push_back(i); vertices.push_back( j);
-//                        vertices.push_back( i); vertices.push_back(j - 0.01f);
-//                        vertices.push_back( i + 0.01f); vertices.push_back( j);
-//                        vertices.push_back(i-0.01f); vertices.push_back(j-0.01f);
-
-//                        indices.push_back(k);
-//                        indices.push_back(k+1);
-//                        indices.push_back(k+2);
-//                        indices.push_back(k+3);
-
-//                        k+=4;
-
-//                    }
-//                   //vertices.last()=; vertices.push_back(j-0.01f);
-//                }
-
 
                 num_indices_ = indices.size();
 
@@ -188,6 +190,18 @@ class Grid {
             // bind textures
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture_id_);
+
+			// setup matrix stack
+			GLint model_id = glGetUniformLocation(program_id_,
+			                                      "model");
+			glUniformMatrix4fv(model_id, ONE, DONT_TRANSPOSE, glm::value_ptr(model));
+			GLint view_id = glGetUniformLocation(program_id_,
+			                                     "view");
+			glUniformMatrix4fv(view_id, ONE, DONT_TRANSPOSE, glm::value_ptr(view));
+			GLint projection_id = glGetUniformLocation(program_id_,
+			                                           "projection");
+			glUniformMatrix4fv(projection_id, ONE, DONT_TRANSPOSE,
+			                   glm::value_ptr(projection));
 
             // setup MVP
             glm::mat4 MVP = projection*view*model;

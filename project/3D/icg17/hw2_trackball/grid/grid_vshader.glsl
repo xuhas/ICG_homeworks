@@ -1,20 +1,27 @@
 #version 330
 //#include <GLFW/glfw3.h>
 //#include<stdlib.h>
-in vec2 position;
 
-out vec2 uv;
+in vec2 position;
+in vec3 vnormal;
 
 uniform float randheight;
-
+uniform mat4 projection;
+uniform mat4 model;
+uniform mat4 view;
 uniform mat4 MVP;
 uniform float time;
+
 out float height;
+out vec3 light_dir;
+out vec4 vpoint_mv;
+out vec2 uv; //needed??
 
-
+vec3 light_pos= vec3(0,0,2);
 
 //Perlin noise
 vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
+
 vec4 mod289(vec4 x)
 {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -58,15 +65,12 @@ float cnoise(vec2 P){
     return 2.3 * n_xy;
   }
 
-
-
 //fractional brownian
 int NUM_OCTAVES=6;
 
 float rand(vec2 n) {
         return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
 }
-
 
 float noise(vec2 p){
         vec2 ip = floor(p);
@@ -78,7 +82,6 @@ float noise(vec2 p){
                 mix(rand(ip+vec2(0.0,1.0)),rand(ip+vec2(1.0,1.0)),u.x),u.y);
         return res*res;
 }
-
 
 float fbm(vec2 x) {
         float v = 0.0;
@@ -95,13 +98,10 @@ float fbm(vec2 x) {
         return v;
 }
 
-
-
-
 void main() {
-float speed = 0.5;
+	float speed = 0.5;
 
-    uv = (position + vec2(1.0, 1.0)) * 5;
+	uv = (position + vec2(1.0, 1.0)) * 5;
 
     // convert the 2D position into 3D positions that all lay in a horizontal
     // plane.
@@ -119,4 +119,12 @@ float speed = 0.5;
     }
 
     gl_Position = MVP * vec4(pos_3d, 1.0);
+
+
+
+	//diffuse shading.
+	///compute the light direction light_dir
+	mat4 MV = view * model;
+	vpoint_mv = MV * vec4(pos_3d, 1.0);
+	light_dir = light_pos - vpoint_mv.xyz;
 }
