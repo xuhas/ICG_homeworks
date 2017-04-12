@@ -16,6 +16,7 @@ out float height;
 out vec3 light_dir;
 out vec4 vpoint_mv;
 out vec2 uv; //needed??
+out float water_level;
 
 vec3 light_pos= vec3(0,0,2);
 
@@ -99,8 +100,9 @@ float fbm(vec2 x) {
 }
 
 void main() {
-	float speed = 0.5;
-
+        float speedt = 0.5;
+        float speedw=1;
+        water_level=0.15;
 	uv = (position + vec2(1.0, 1.0)) * 5;
 
     // convert the 2D position into 3D positions that all lay in a horizontal
@@ -108,11 +110,11 @@ void main() {
     // TODO 6: animate the height of the grid points as a sine function of the
     // 'time' and the position ('uv') within the grid.
 
-    height = fbm(uv/3+time/3) ;
+    height = fbm(uv/5-time*speedt/3) ;
     vec3 pos_3d = vec3(0.0,0.0,0.0);
 
-    if(height<0.15){
-         pos_3d = vec3(position.x, -position.y, 0.15+fbm(uv*2+time*speed/50)/10);//adjust inside fbm for movement of water
+    if(height<water_level){
+         pos_3d = vec3(position.x, -position.y, water_level+fbm(uv*2+time*speedw/50)/100);//adjust inside fbm for movement of water
     }
     else{
          pos_3d = vec3(position.x, -position.y,height);//generation of the terrain

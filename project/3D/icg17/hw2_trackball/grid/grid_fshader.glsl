@@ -4,7 +4,7 @@ in vec2 uv; //needed??
 in float height;
 in vec3 light_dir;
 in vec4 vpoint_mv;
-
+in float water_level;
 vec3 Ld = vec3(1,1,1);
 vec3 kd = vec3(0.3,0.3,0.3);
 
@@ -15,7 +15,7 @@ out vec3 color;
 void main() {
 	vec3 col_low = vec3(0.3, 0.6, 0.3);
 	vec3 col_high = vec3(0.8, 0.6, 0.3);
-	float water_limit = 0.15;
+        float water_limit = water_level;
 	float snow_limit = 0.5;
 
 	if(height <= water_limit) //water
