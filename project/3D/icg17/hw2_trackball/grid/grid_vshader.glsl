@@ -100,7 +100,7 @@ float fbm(vec2 x) {
 }
 
 void main() {
-        float speedt = 0.5;
+        float speedt = 1;
         float speedw=1;
         water_level=0.15;
 	uv = (position + vec2(1.0, 1.0)) * 5;
