@@ -13,12 +13,18 @@ Xhulio Hasani:
 	-Heightmap in 2D with perlin noise
 	-Recycling of hw2 
 	-Terrain generation with perlin noise and fBm
-	-infinite terrain
-	-water bodies animations
+	-Infinite terrain
+	-Water bodies animations
+Fraction of workload: 50%
 
 
 Andrea Gulberti:
-	-
+	-Debugging 
+	-Diffuse shading
+Fraction of workload: 50%
+
 
 Marouane Fahli:
-	-
+	-?
+Fraction of workload: ?
+
