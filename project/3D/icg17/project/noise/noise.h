@@ -56,7 +56,7 @@ class Noise {
             glDeleteVertexArrays(1, &vertex_array_id_);
         }
 
-        void Draw(const glm::mat4 &model,
+        void Draw(float time, const glm::mat4 &model,
                   const glm::mat4 &view,
                   const glm::mat4 &projection) {
             glUseProgram(program_id_);

@@ -4,6 +4,7 @@
 
 in vec2 position;
 in vec3 vnormal;
+in vec2 vtexcoord;
 
 uniform float randheight;
 uniform mat4 projection;
@@ -103,7 +104,7 @@ void main() {
         float speedt = 0.5;
         float speedw=1;
         water_level=0.15;
-	uv = (position + vec2(1.0, 1.0)) * 5;
+            uv = (position + vec2(1.0, 1.0)) * 0.5;
 
     // convert the 2D position into 3D positions that all lay in a horizontal
     // plane.
@@ -121,7 +122,6 @@ void main() {
     }
 
     gl_Position = MVP * vec4(pos_3d, 1.0);
-
 
 
 	//diffuse shading.

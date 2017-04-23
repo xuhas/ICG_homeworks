@@ -7,11 +7,14 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-
 #include "grid/grid.h"
+#include "noise/noise.h"
+#include "framebuffer.h"
 #include "trackball.h"
 
 Grid grid;
+Noise noise;
+FrameBuffer framebuffer;
 
 int window_width = 800;
 int window_height = 600;
@@ -45,31 +48,31 @@ mat4 OrthographicProjection(float left, float right, float bottom,
 mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     // TODO 1: Create a perspective projection matrix given the field of view,
     // aspect ratio, and near and far plane distances.
-	assert(far > near);
+    assert(far > near);
 
-	float top = near * tan(radians(fovy));
-	float bottom = - top;
-	float right = top * aspect;
-	float left = -right;
+    float top = near * tan(radians(fovy));
+    float bottom = - top;
+    float right = top * aspect;
+    float left = -right;
 
-	vec4 C0(0.0f);
-	vec4 C1(0.0f);
-	vec4 C2(0.0f);
-	vec4 C3(0.0f);
+    vec4 C0(0.0f);
+    vec4 C1(0.0f);
+    vec4 C2(0.0f);
+    vec4 C3(0.0f);
 
-	C0[0] = 2 * near / (right - left);
+    C0[0] = 2 * near / (right - left);
 
-	C1[1] = 2 * near / (top - bottom);
+    C1[1] = 2 * near / (top - bottom);
 
-	C2[0] = (right + left) / (right - left);
-	C2[1] = (top + bottom) / (top - bottom);
-	C2[2] = -(far + near) / (far - near);
-	C2[3] = -1;
+    C2[0] = (right + left) / (right - left);
+    C2[1] = (top + bottom) / (top - bottom);
+    C2[2] = -(far + near) / (far - near);
+    C2[3] = -1;
 
-	C3[2] = -2 * far * near / (far - near);
+    C3[2] = -2 * far * near / (far - near);
 
-	mat4 projection(C0, C1, C2, C3);
-	return projection;
+    mat4 projection(C0, C1, C2, C3);
+    return projection;
 }
 
 mat4 LookAt(vec3 eye, vec3 center, vec3 up) {
@@ -83,19 +86,18 @@ mat4 LookAt(vec3 eye, vec3 center, vec3 up) {
     R = transpose(R);
 
     mat4 look_at(vec4(R[0], 0.0f),
-                 vec4(R[1], 0.0f),
-                 vec4(R[2], 0.0f),
-                 vec4(-R * (eye), 1.0f));
+            vec4(R[1], 0.0f),
+            vec4(R[2], 0.0f),
+            vec4(-R * (eye), 1.0f));
     return look_at;
 }
 
 void Init() {
     // sets background color
     glClearColor(0.9, 0.9, 1.0 /*gray*/, 0.5 /*solid*/);
-    
-
-
-    grid.Init();
+    noise.Init();
+    GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
+    grid.Init(framebuffer_texture_id);
 
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
@@ -104,11 +106,11 @@ void Init() {
     // looks straight down the -z axis. Otherwise the trackball's rotation gets
     // applied in a rotated coordinate frame.
     // uncomment lower line to achieve this.
-    //view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
-//                         vec3(0.0f, 0.0f, 0.0f),
-//                         vec3(0.0f, 1.0f, 0.0f));
+    view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
+                         vec3(0.0f, 0.0f, 0.0f),
+                         vec3(0.0f, 1.0f, 0.0f));
 
-	view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
+    view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
 
     trackball_matrix = IDENTITY_MATRIX;
 
@@ -128,6 +130,14 @@ void Display() {
 
 
     // draw a quad on the ground.
+
+    framebuffer.Bind();
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        noise.Draw(time, IDENTITY_MATRIX, view_matrix, projection_matrix);
+    }
+    framebuffer.Unbind();
+
     grid.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
 }
 
@@ -150,19 +160,19 @@ void MouseButton(GLFWwindow* window, int button, int action, int mod) {
         glfwGetCursorPos(window, &x_i, &y_i);
         vec2 p = TransformScreenCoords(window, x_i, y_i);
         trackball.BeingDrag(p.x, p.y);
-		old_trackball_matrix = trackball_matrix;
+        old_trackball_matrix = trackball_matrix;
         // Store the current state of the model matrix.
     }
 }
 
 void MousePos(GLFWwindow* window, double x, double y) {
-	vec2 p = TransformScreenCoords(window, x, y);
+    vec2 p = TransformScreenCoords(window, x, y);
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         // TODO 3: Calculate 'trackball_matrix' given the return value of
         // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
         // See also the mouse_button(...) function.
-		//trackball_matrix = ...
-		trackball_matrix =  trackball.Drag(p.x, p.y) * old_trackball_matrix;
+        //trackball_matrix = ...
+        trackball_matrix =  trackball.Drag(p.x, p.y) * old_trackball_matrix;
     }
 
     // zoom
@@ -172,11 +182,11 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // should zoom out and it. For that you have to update the current
         // 'view_matrix' with a translation along the z axis.
         // view_matrix = ...
-		float var;
-		var = p.y - last_y;
-		view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, var * 4));
+        float var;
+        var = p.y - last_y;
+        view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, var * 4));
     }
-	last_y = p.y;
+    last_y = p.y;
 }
 
 // Gets called when the windows/framebuffer is resized.
@@ -189,13 +199,13 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
 
     glViewport(0, 0, window_width, window_height);
 
-	//TODO 1: Use a perspective projection instead;
-	projection_matrix = PerspectiveProjection(45.0f,
-	                                         (GLfloat)window_width / window_height,
-	                                         0.1f, 100.0f);
-//	GLfloat top = 1.0f;
-//	GLfloat right = (GLfloat)window_width / window_height * top;
-//	projection_matrix = OrthographicProjection(-right, right, -top, top, -10.0, 10.0f);
+    //TODO 1: Use a perspective projection instead;
+    projection_matrix = PerspectiveProjection(45.0f,
+                                              (GLfloat)window_width / window_height,
+                                              0.1f, 100.0f);
+    //	GLfloat top = 1.0f;
+    //	GLfloat right = (GLfloat)window_width / window_height * top;
+    //	projection_matrix = OrthographicProjection(-right, right, -top, top, -10.0, 10.0f);
 }
 
 void ErrorCallback(int error, const char* description) {
@@ -256,7 +266,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-	cout << "OpenGL" << glGetString(GL_VERSION) << endl;
+    cout << "OpenGL" << glGetString(GL_VERSION) << endl;
 
     // initialize our OpenGL program
     Init();
@@ -274,7 +284,8 @@ int main(int argc, char *argv[]) {
     }
 
     grid.Cleanup();
-
+    noise.Cleanup();
+    framebuffer.Cleanup();
 
     // close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);
