@@ -5,7 +5,7 @@
 in vec2 position;
 in vec3 vnormal;
 
-uniform float randheight;
+uniform float randheight; //usefull??
 uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
@@ -15,13 +15,15 @@ uniform float time;
 out float height;
 out vec3 light_dir;
 out vec4 vpoint_mv;
-out vec2 uv; //needed??
-out float water_level;
+out vec2 uv;
+//out float water_level;
 
 vec3 light_pos= vec3(0,0,2);
 
 //Perlin noise
-vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
+vec2 fade(vec2 t) {
+	return t*t*t*(t*(t*6.0-15.0)+10.0);
+}
 
 vec4 mod289(vec4 x)
 {
@@ -100,29 +102,18 @@ float fbm(vec2 x) {
 }
 
 void main() {
-        float speedt = 1;
-        float speedw=1;
-        water_level=0.15;
-	uv = (position + vec2(1.0, 1.0)) * 5;
+	float speedt = 1.0 / 3.0;
+	//float speedw = 1;
+	//water_level = 0.15;
+	uv = (position + vec2(1.0, 1.0) - time * speedt); //position+(1.0,1.0) goes from (0.0,0.0) to (2.0,2.0)
 
-    // convert the 2D position into 3D positions that all lay in a horizontal
-    // plane.
-    // TODO 6: animate the height of the grid points as a sine function of the
-    // 'time' and the position ('uv') within the grid.
+	height = fbm(uv);
 
-    height = fbm(uv/5-time*speedt/3) ;
     vec3 pos_3d = vec3(0.0,0.0,0.0);
 
-    if(height<water_level){
-         pos_3d = vec3(position.x, -position.y, water_level+fbm(uv*2+time*speedw/50)/100);//adjust inside fbm for movement of water
-    }
-    else{
-         pos_3d = vec3(position.x, -position.y,height);//generation of the terrain
-    }
+	pos_3d = vec3(position.x, position.y, height);//generation of the terrain
 
     gl_Position = MVP * vec4(pos_3d, 1.0);
-
-
 
 	//diffuse shading.
 	///compute the light direction light_dir

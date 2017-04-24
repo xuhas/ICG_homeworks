@@ -5,7 +5,7 @@ file(GLOB_RECURSE HEADERS "*.h")
 
 # these files are copied only once
 file(GLOB TEXTURES
-    grid/grid_texture.tga)
+	grid/*.tga)
 copy_files_once(${TEXTURES})
 
 # list all the files you want to copy everytime
