@@ -16,11 +16,18 @@ out float height;
 out vec3 light_dir;
 out vec4 vpoint_mv;
 out vec2 uv;
-//out float water_level;
 
+//Most of the code is inspired from https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+//there are many tipes of noises we tried so there is code that is not actually used but can be used late
+//e.g. Using simple perlin noise for sandy parts of the terrain si more realistic than using the Brownnian one.
+
+
+
+
+//out float water_level;
 vec3 light_pos= vec3(0,0,2);
 
-//Perlin noise
+//some fctns used in Perlin noise
 vec2 fade(vec2 t) {
 	return t*t*t*(t*(t*6.0-15.0)+10.0);
 }
@@ -35,6 +42,8 @@ vec4 permute(vec4 x)
     return mod289(((x*34.0)+1.0)*x);
 }
 
+
+//perlin noise
 float cnoise(vec2 P){
     vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
     vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
