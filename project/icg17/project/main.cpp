@@ -46,7 +46,7 @@ mat4 OrthographicProjection(float left, float right, float bottom,
 }
 
 mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
-    // TODO 1: Create a perspective projection matrix given the field of view,
+    // Create a perspective projection matrix given the field of view,
     // aspect ratio, and near and far plane distances.
     assert(far > near);
 
@@ -96,16 +96,17 @@ void Init() {
     // sets background color
     glClearColor(0.9, 0.9, 1.0 /*gray*/, 0.5 /*solid*/);
     noise.Init();
-    GLuint framebuffer_texture_id = framebuffer.Init(512, 512);
+    //GLuint framebuffer_texture_id = framebuffer.Init(512, 512);
+    GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
+
     grid.Init(framebuffer_texture_id);
 
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
 
-    // TODO 3: once you use the trackball, you should use a view matrix that
+    // once you use the trackball, you should use a view matrix that
     // looks straight down the -z axis. Otherwise the trackball's rotation gets
     // applied in a rotated coordinate frame.
-    // uncomment lower line to achieve this.
     view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
                          vec3(0.0f, 0.0f, 0.0f),
                          vec3(0.0f, 1.0f, 0.0f));
@@ -160,7 +161,7 @@ void MouseButton(GLFWwindow* window, int button, int action, int mod) {
 void MousePos(GLFWwindow* window, double x, double y) {
     vec2 p = TransformScreenCoords(window, x, y);
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        // TODO 3: Calculate 'trackball_matrix' given the return value of
+        // Calculate 'trackball_matrix' given the return value of
         // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
         // See also the mouse_button(...) function.
         //trackball_matrix = ...
@@ -169,7 +170,7 @@ void MousePos(GLFWwindow* window, double x, double y) {
 
     // zoom
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        // TODO 4: Implement zooming. When the right mouse button is pressed,
+        // Implement zooming. When the right mouse button is pressed,
         // moving the mouse cursor up and down (along the screen's y axis)
         // should zoom out and it. For that you have to update the current
         // 'view_matrix' with a translation along the z axis.
@@ -186,18 +187,17 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
     window_width = width;
     window_height = height;
 
-    cout << "Window has been resized to "
+    cout << "Framebuffer has been resized to "
          << window_width << "x" << window_height << "." << endl;
 
     glViewport(0, 0, window_width, window_height);
 
-    //TODO 1: Use a perspective projection instead;
+    //Use a perspective projection instead;
     projection_matrix = PerspectiveProjection(45.0f,
                                               (GLfloat)window_width / window_height,
                                               0.1f, 100.0f);
-    //	GLfloat top = 1.0f;
-    //	GLfloat right = (GLfloat)window_width / window_height * top;
-    //	projection_matrix = OrthographicProjection(-right, right, -top, top, -10.0, 10.0f);
+    framebuffer.Cleanup();
+    framebuffer.Init(window_width, window_height);
 }
 
 void ErrorCallback(int error, const char* description) {
