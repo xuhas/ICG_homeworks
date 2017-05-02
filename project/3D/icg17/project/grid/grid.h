@@ -11,10 +11,49 @@ private:
     GLuint vertex_buffer_object_;           // memory buffer for texture coordinates
     GLuint program_id_;                     // GLSL shader program ID
     GLuint texture_id_;                     // texture ID
+    GLuint texture_sand_id_;                // texture sand ID
+    GLuint texture_grass_id_;                // texture grass ID
+    GLuint texture_rock_id_;                // texture rock ID
+    GLuint texture_snow_id_;                // texture snow ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint MVP_id_;                         // model, view, proj matrix ID
 
 public:
+
+    void load_tex(GLuint &textureID, const char* filename){
+        int width;
+        int height;
+        int nb_component;
+
+        // set stb_image to have the same coordinates as OpenGL
+        stbi_set_flip_vertically_on_load(1);
+        unsigned char * image = stbi_load(filename, &width,
+                                         &height, &nb_component, 0);
+
+        if(image == nullptr) {
+            printf("%s\n",stbi_failure_reason());
+            throw("Failed to load texture");
+        }
+
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+        if(nb_component == 3) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
+                         GL_RGB, GL_UNSIGNED_BYTE, image);
+        } else if(nb_component == 4) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                         GL_RGBA, GL_UNSIGNED_BYTE, image);
+        }
+
+        // cleanup
+        glBindTexture(GL_TEXTURE_2D, 0);
+        stbi_image_free(image);
+    }
+
+
     void Init(GLuint texture) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
@@ -128,6 +167,8 @@ public:
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 
+
+
         // texture coordinates
         {
             const GLfloat vertex_texture_coordinates[] = { /*V1*/ 0.0f, 0.0f,
@@ -157,6 +198,28 @@ public:
         glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
         glBindTexture(GL_TEXTURE_2D, 0);
 
+        {
+            //SAND
+            texture_sand_id_ = glGetUniformLocation(program_id_, "tex_sand");
+            glUniform1i(texture_sand_id_, 1 /*GL_TEXTURE1*/);
+            load_tex(texture_sand_id_,"sand.tga");
+
+            //GRASS
+            texture_grass_id_ = glGetUniformLocation(program_id_, "tex_grass");
+            glUniform1i(texture_grass_id_, 2 /*GL_TEXTURE2*/);
+            load_tex(texture_grass_id_,"grass.tga");
+
+            //ROCK
+            texture_rock_id_ = glGetUniformLocation(program_id_, "tex_rock");
+            glUniform1i(texture_rock_id_, 3 /*GL_TEXTURE3*/);
+            load_tex(texture_rock_id_,"rock.tga");
+
+            //SNOW
+            texture_snow_id_ = glGetUniformLocation(program_id_, "tex_snow");
+            glUniform1i(texture_snow_id_, 4 /*GL_TEXTURE4*/);
+            load_tex(texture_snow_id_,"snow.tga");
+        }
+
         // other uniforms
         MVP_id_ = glGetUniformLocation(program_id_, "MVP");
 
@@ -185,6 +248,14 @@ public:
         // bind textures
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_id_);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture_sand_id_);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texture_grass_id_);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, texture_rock_id_);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, texture_snow_id_);
 
         // setup matrix stack
         GLint model_id = glGetUniformLocation(program_id_,

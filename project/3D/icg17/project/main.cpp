@@ -96,7 +96,7 @@ void Init() {
     // sets background color
     glClearColor(0.9, 0.9, 1.0 /*gray*/, 0.5 /*solid*/);
     noise.Init();
-    GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
+    GLuint framebuffer_texture_id = framebuffer.Init(512, 512);
     grid.Init(framebuffer_texture_id);
 
     // enable depth test.
@@ -122,14 +122,6 @@ void Display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const float time = glfwGetTime();
-
-
-    //trying to make a random height
-
-    //glm::float32 randheight = std::rand()-1;
-
-
-    // draw a quad on the ground.
 
     framebuffer.Bind();
     {
@@ -283,9 +275,10 @@ int main(int argc, char *argv[]) {
         glfwPollEvents();
     }
 
-    grid.Cleanup();
+
     noise.Cleanup();
     framebuffer.Cleanup();
+    grid.Cleanup();
 
     // close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);

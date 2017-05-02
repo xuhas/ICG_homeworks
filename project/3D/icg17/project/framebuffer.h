@@ -21,6 +21,7 @@ class FrameBuffer {
 
         void Unbind() {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glViewport(0, 0, 800, 600);
         }
 
         int Init(int image_width, int image_height, bool use_interpolation = false) {
