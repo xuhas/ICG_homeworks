@@ -1,0 +1,30 @@
+ICG 
+Projet: part 1
+
+State of the project:
+
+We did the height map in 2D and in 3D. The terrain has been generated with Perlin noise as well as with fractional Brownian motion. The result is very parameter sensible but we still manage to have something good. We have higher mountains and water bodies. We can manipulate the generation of the terrain to make it look like we are advancing in an infinite terrain and we can also give movement to the water bodies to animate them. The whole thing is done by receycling the trackball homework so we can move around the terrain  and look at it on every angle. 
+
+The shading can be done better as well as the texture, there is maybe a bit of aliasing that has to be corrected. The colors have to be a bit bitter.
+
+Workload of each group member:
+
+Xhulio Hasani:
+	-Heightmap in 2D with perlin noise
+	-Recycling of hw2 
+	-Terrain generation with perlin noise and fBm
+	-Infinite terrain
+	-Water bodies animations
+Fraction of workload: 50%
+
+
+Andrea Gulberti:
+	-Debugging 
+	-Diffuse shading
+Fraction of workload: 50%
+
+
+Marouane Fahli:
+	-?
+Fraction of workload: ?
+
