@@ -9,11 +9,13 @@
 
 #include "grid/grid.h"
 #include "noise/noise.h"
+#include "skybox/skybox.h"
 #include "framebuffer.h"
 #include "trackball.h"
 
 Grid grid;
 Noise noise;
+Skybox skybox;
 FrameBuffer framebuffer;
 
 int window_width = 800;
@@ -96,6 +98,7 @@ void Init() {
     // sets background color
     glClearColor(0.9, 0.9, 1.0 /*gray*/, 0.5 /*solid*/);
     noise.Init();
+    skybox.Init();
     //GLuint framebuffer_texture_id = framebuffer.Init(512, 512);
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
 
@@ -131,7 +134,9 @@ void Display() {
     }
     framebuffer.Unbind();
 
+    skybox.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
     grid.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
+
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -277,6 +282,7 @@ int main(int argc, char *argv[]) {
 
 
     noise.Cleanup();
+    skybox.Cleanup();
     framebuffer.Cleanup();
     grid.Cleanup();
 
