@@ -8,7 +8,6 @@ out vec3 light_dir;
 
 uniform mat4 MVP;
 uniform mat4 MV;
-//uniform float water_ampl;
 uniform float water_height;
 uniform float time;
 
