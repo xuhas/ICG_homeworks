@@ -33,7 +33,7 @@ public:
       // you might want to scale the rotation magnitude by a scalar factor.
       // p.s. No need for using complicated quaternions as suggested inthe wiki
       // article.
-	  float sensitivity = 1.0f;
+      float sensitivity = 1.5f;
 	  vec3 rot_axis = cross(anchor_pos_, current_pos);
 	  float mag = length(rot_axis);
 	  rot_axis = normalize(rot_axis);

@@ -7,7 +7,9 @@ file(GLOB_RECURSE HEADERS "*.h")
 # these files are copied only once
 file(GLOB TEXTURES
 	grid/*.tga
+	water/*.tga)
 	skybox/*.png)
+
 copy_files_once(${TEXTURES})
 
 # list all the files you want to copy everytime
@@ -17,8 +19,11 @@ file(GLOB SHADERS
   grid/grid_fshader.glsl
   noise/noise_vshader.glsl
   noise/noise_fshader.glsl
+  water/water_vshader.glsl
+  water/water_fshader.glsl)
   skybox/skybox_vshader.glsl
   skybox/skybox_fshader.glsl)
+
 deploy_shaders_to_build_dir(${SHADERS})
 
 add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS})
