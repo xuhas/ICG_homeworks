@@ -14,6 +14,7 @@ private:
     GLuint MVP_id_;                         // model, view, proj matrix ID
 
 public:
+
     void initCubeMap(GLuint& texture) {
         glActiveTexture(GL_TEXTURE0);
         glEnable(GL_TEXTURE_CUBE_MAP);
@@ -33,7 +34,9 @@ public:
         int nb_component;
 
         // set stb_image to have the same coordinates as OpenGL
-        stbi_set_flip_vertically_on_load(1);
+
+            stbi_set_flip_vertically_on_load(1);
+
         unsigned char * image = stbi_load(filename, &width,
                                           &height, &nb_component, 0);
 
@@ -57,11 +60,6 @@ public:
         setupOneSide(texture, zpos, GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
         setupOneSide(texture, zneg, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
     }
-
-    void deleteCubeMap(GLuint& texture) {
-        glDeleteTextures(1, &texture);
-    }
-
     void Init() {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("skybox_vshader.glsl",
@@ -76,49 +74,65 @@ public:
         glGenVertexArrays(1, &vertex_array_id_);
         glBindVertexArray(vertex_array_id_);
 
-        // cube vertices for vertex buffer object
-        GLfloat cube_vertices[] = {
-            -1.0,  1.0,  1.0,
-            -1.0, -1.0,  1.0,
-            1.0, -1.0,  1.0,
-            1.0,  1.0,  1.0,
-            -1.0,  1.0, -1.0,
-            -1.0, -1.0, -1.0,
-            1.0, -1.0, -1.0,
-            1.0,  1.0, -1.0,
-        };
+        // Position buffer
+        const GLfloat position[] = {-1.0f, -1.0f,  1.0f, // left, bottom, front
+                                    1.0f, -1.0f,  1.0f,  // right, bottom, front
+                                    1.0f,  1.0f,  1.0f,  // right, top, front
+                                    -1.0f,  1.0f,  1.0f, // left, top, front
+                                    -1.0f, -1.0f, -1.0f, // left, bottom, back
+                                    1.0f, -1.0f, -1.0f,  // right, bottom, back
+                                    1.0f,  1.0f, -1.0f,  // right, top, back
+                                    -1.0f,  1.0f, -1.0f};// left, top, back
+
         glGenBuffers(1, &vertex_buffer_object_position_);
         glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_position_);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(position), position, GL_STATIC_DRAW);
 
-        // cube indices for index buffer object
-        GLushort cube_indices[] = {
-            0, 1, 2, 3,
-            3, 2, 6, 7,
-            7, 6, 5, 4,
-            4, 5, 1, 0,
-            0, 3, 7, 4,
-            1, 2, 6, 5,
-        };
-        num_indices_ = sizeof(cube_indices)/sizeof(GLushort);
+        // position shader attribute
+        // fetch attribute ID for vertex positions
+        GLuint loc_position = glGetAttribLocation(program_id_, "position");
+        glEnableVertexAttribArray(loc_position); // Enable it
+        glVertexAttribPointer(loc_position, 3, GL_FLOAT, DONT_NORMALIZE,
+                              ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+
+        // index buffer
+        const GLuint index[] = {0, 1, 2,  // front face triangle 1
+                                0, 2, 3,  // front face triangle 2
+                                1, 5, 6,  // right face triangle 1
+                                1, 6, 2,  // right face triangle 2
+                                5, 4, 7,  // back face triangle 1
+                                5, 7, 6,  // back face triangle 2
+                                4, 0, 3,  // left face triangle 1
+                                4, 3, 7,  // left face triangle 2
+                                3, 2, 6,  // top face triangle 1
+                                3, 6, 7,  // top face triangle 2
+                                1, 0, 4,  // bottom face triangle 1
+                                1, 4, 5}; // bottom face triangle 2
+
+        num_indices_ = sizeof(index) / sizeof(GLuint);
+
         glGenBuffers(1, &vertex_buffer_object_index_);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer_object_index_);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW);
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
 
-        GLuint loc_position = glGetAttribLocation(program_id_, "position");
-        glEnableVertexAttribArray(loc_position);
-        glVertexAttribPointer(loc_position, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
+        //texture
         GLuint texture;
-        setupCubeMap(texture, "desertsky_bk.tga", "desertsky_dn.tga", "desertsky_ft.tga", "desertsky_lf.tga", "desertsky_rt.tga", "desertsky_up.tga");
+        setupCubeMap(texture,
+                     "TropicalSunnyDayRight2048.png",
+                     "TropicalSunnyDayLeft2048.png",
+                     "TropicalSunnyDayBack2048.png",
+                     "TropicalSunnyDayFront2048.png",
+                     "TropicalSunnyDayUp2048.png",
+                     "TropicalSunnyDayDown2048.png");
 
         this->texture_id_ = texture;
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id_);
         GLuint tex_id = glGetUniformLocation(program_id_, "cubemap");
         glUniform1i(tex_id, 4 /*GL_TEXTURE0*/);
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+        // other uniforms
+        MVP_id_ = glGetUniformLocation(program_id_, "MVP");
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
@@ -130,12 +144,11 @@ public:
         glUseProgram(0);
         glDeleteBuffers(1, &vertex_buffer_object_position_);
         glDeleteBuffers(1, &vertex_buffer_object_index_);
-        glDeleteVertexArrays(1, &vertex_array_id_);
         glDeleteProgram(program_id_);
-        glDeleteTextures(1, &texture_id_);
+        glDeleteVertexArrays(1, &vertex_array_id_);
     }
 
-    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
@@ -148,10 +161,9 @@ public:
         // setup MVP
         glm::mat4 MVP = projection*view*model;
         glUniformMatrix4fv(MVP_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(MVP));
-        GLuint MVP_id = glGetUniformLocation(program_id_, "MVP");
-        glUniformMatrix4fv(MVP_id, 1, GL_FALSE, value_ptr(MVP));
 
-        glDrawElements(GL_QUADS, num_indices_, GL_UNSIGNED_SHORT, 0);
+        // draw
+        glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
         glUseProgram(0);

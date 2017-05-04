@@ -134,7 +134,7 @@ void Display() {
     }
     framebuffer.Unbind();
 
-    skybox.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
+    skybox.Draw(trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
     grid.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
 
 }
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
     // note some Intel GPUs do not support OpenGL 3.2
     // note update the driver of your graphic card
     GLFWwindow* window = glfwCreateWindow(window_width, window_height,
-                                          "Trackball", NULL, NULL);
+                                          "Infinite Terrain", NULL, NULL);
     if(!window) {
         glfwTerminate();
         return EXIT_FAILURE;
