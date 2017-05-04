@@ -11,10 +11,14 @@
 #include "noise/noise.h"
 #include "framebuffer.h"
 #include "trackball.h"
+#include "water/water.h"
+#include "param.h"
 
 Grid grid;
 Noise noise;
 FrameBuffer framebuffer;
+Water water;
+//FrameBuffer water_reflection; // water reflection
 
 int window_width = 800;
 int window_height = 600;
@@ -25,7 +29,7 @@ mat4 projection_matrix;
 mat4 view_matrix;
 mat4 trackball_matrix;
 mat4 old_trackball_matrix;
-mat4 quad_model_matrix;
+mat4 model_matrix;
 
 Trackball trackball;
 
@@ -95,11 +99,15 @@ mat4 LookAt(vec3 eye, vec3 center, vec3 up) {
 void Init() {
     // sets background color
     glClearColor(0.9, 0.9, 1.0 /*gray*/, 0.5 /*solid*/);
-    noise.Init();
-    //GLuint framebuffer_texture_id = framebuffer.Init(512, 512);
-    GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
 
+    GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
+    //GLuint water_reflection_tex_id = water_reflection.Init(window_width, window_height, false);
+
+    noise.Init();
     grid.Init(framebuffer_texture_id);
+    //water.Init(water_reflection_tex_id);
+    water.Init(framebuffer_texture_id);
+
 
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
@@ -107,15 +115,16 @@ void Init() {
     // once you use the trackball, you should use a view matrix that
     // looks straight down the -z axis. Otherwise the trackball's rotation gets
     // applied in a rotated coordinate frame.
-    view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
+    view_matrix = LookAt(vec3(0.0f, 0.0f, 40.0f),
                          vec3(0.0f, 0.0f, 0.0f),
                          vec3(0.0f, 1.0f, 0.0f));
 
-    view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
+    view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, 0.0f));
 
     trackball_matrix = IDENTITY_MATRIX;
 
-    quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
+    model_matrix = scale(mat4(1.0f),vec3(60,60,60));
+    model_matrix = translate(model_matrix,vec3(-0.25f, -0.25f, 0.0f));
 }
 
 // gets called for every frame.
@@ -123,6 +132,8 @@ void Display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const float time = glfwGetTime();
+    //float water_height_sh = WATER_HEIGHT + WATER_AMPL * sin(time);
+    //float water_height = (water_height_sh + 1) / 2;
 
     framebuffer.Bind();
     {
@@ -131,7 +142,24 @@ void Display() {
     }
     framebuffer.Unbind();
 
-    grid.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
+//    water_reflection.Bind();
+//    {
+//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//        glEnable(GL_CLIP_DISTANCE0);
+
+//        drawChunks(model_matrix, view_matrix_reflection, projection_matrix, curr_time, water_height);
+//        sky.Draw(translate(projection_matrix * model_matrix * view_matrix_reflection, cam_pos2));
+//        drawTrees(model_matrix, view_matrix_reflection, projection_matrix, curr_time, water_height_sh);
+
+//        glDisable(GL_CLIP_DISTANCE0);
+//    }
+//    water_reflection.Unbind();
+    //mat4 model = scale(model_matrix, vec3(WATER_SIZE, 1, WATER_SIZE));
+    //model = translate(model, vec3(cam_pos.x / WATER_SIZE, WATER_HEIGHT, cam_pos.z / WATER_SIZE));
+
+    //draw before solid objects, then transparent objects to achive the blending of the colours
+    grid.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
+    water.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -177,7 +205,7 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // view_matrix = ...
         float var;
         var = p.y - last_y;
-        view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, var * 4));
+        view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, var * ZOOM_SENSITIVITY));
     }
     last_y = p.y;
 }
@@ -195,7 +223,7 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
     //Use a perspective projection instead;
     projection_matrix = PerspectiveProjection(45.0f,
                                               (GLfloat)window_width / window_height,
-                                              0.1f, 100.0f);
+                                              0.1f, 400.0f);
     framebuffer.Cleanup();
     framebuffer.Init(window_width, window_height);
 }
