@@ -9,6 +9,7 @@
 
 #include "grid/grid.h"
 #include "noise/noise.h"
+#include "skybox/skybox.h"
 #include "framebuffer.h"
 #include "trackball.h"
 #include "water/water.h"
@@ -16,6 +17,7 @@
 
 Grid grid;
 Noise noise;
+Skybox skybox;
 FrameBuffer framebuffer;
 Water water;
 //FrameBuffer water_reflection; // water reflection
@@ -100,6 +102,9 @@ void Init() {
     // sets background color
     glClearColor(0.9, 0.9, 1.0 /*gray*/, 0.5 /*solid*/);
 
+    noise.Init();
+    skybox.Init();
+    //GLuint framebuffer_texture_id = framebuffer.Init(512, 512);
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
     //GLuint water_reflection_tex_id = water_reflection.Init(window_width, window_height, false);
 
@@ -142,6 +147,7 @@ void Display() {
     }
     framebuffer.Unbind();
 
+
 //    water_reflection.Bind();
 //    {
 //        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -160,6 +166,10 @@ void Display() {
     //draw before solid objects, then transparent objects to achive the blending of the colours
     grid.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
     water.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
+    skybox.Draw(trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
+    grid.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
+
+
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -259,7 +269,7 @@ int main(int argc, char *argv[]) {
     // note some Intel GPUs do not support OpenGL 3.2
     // note update the driver of your graphic card
     GLFWwindow* window = glfwCreateWindow(window_width, window_height,
-                                          "Trackball", NULL, NULL);
+                                          "Infinite Terrain", NULL, NULL);
     if(!window) {
         glfwTerminate();
         return EXIT_FAILURE;
@@ -305,6 +315,7 @@ int main(int argc, char *argv[]) {
 
 
     noise.Cleanup();
+    skybox.Cleanup();
     framebuffer.Cleanup();
     grid.Cleanup();
 
