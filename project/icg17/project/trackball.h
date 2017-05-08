@@ -1,6 +1,6 @@
 #pragma once
 #include "icg_helper.h"
-
+#include "param.h"
 
 using namespace glm;
 
@@ -26,18 +26,17 @@ public:
       ProjectOntoSurface(current_pos);
 
       mat4 rotation = IDENTITY_MATRIX;
-      // TODO 3: Calculate the rotation given the projections of the anocher
+      // Calculate the rotation given the projections of the anocher
       // point and the current position. The rotation axis is given by the cross
       // product of the two projected points, and the angle between them can be
       // used as the magnitude of the rotation.
       // you might want to scale the rotation magnitude by a scalar factor.
       // p.s. No need for using complicated quaternions as suggested inthe wiki
       // article.
-      float sensitivity = 1.5f;
 	  vec3 rot_axis = cross(anchor_pos_, current_pos);
 	  float mag = length(rot_axis);
 	  rot_axis = normalize(rot_axis);
-	  rotation = rotate(rotation, mag*sensitivity, rot_axis);
+      rotation = rotate(rotation, mag*ROTATION_SENSITIVITY, rot_axis);
       return rotation;
     }
 
@@ -48,7 +47,7 @@ private:
     // https://www.opengl.org/wiki/Object_Mouse_Trackball.
     // The trackball radius is given by 'radius_'.
     void ProjectOntoSurface(vec3& p) const {
-      // TODO 2: Implement this function. Read above link for details.
+      // Implement this function. Read above link for details.
         float p_radius=sqrt(pow(p.x,2) + pow(p.y,2))/2;
 		//check if the mouse is inside the sphere
 		if (p_radius <= radius_){
@@ -62,5 +61,4 @@ private:
 
     float radius_;
     vec3 anchor_pos_;
-    mat4 rotation_;
 };

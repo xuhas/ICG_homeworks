@@ -11,23 +11,25 @@ uniform sampler2D tex_grass;
 uniform sampler2D tex_rock;
 uniform sampler2D tex_snow;
 uniform float time;
-
+uniform float WATER_HEIGHT; //param.h
+uniform float BEACH_HEIGHT; //param.h
+uniform float ROCK_HEIGHT; //param.h
+uniform float SNOW_HEIGHT; //param.h
+uniform bool USE_COLOURS; //param.h
 out vec3 color;
 
-vec3 Ld = vec3(1,1,1);
-vec3 kd = vec3(0.3,0.3,0.3);
+vec3 Ld = vec3(1,1,1); //TODO add in param.h
+vec3 kd = vec3(0.3,0.3,0.3); //TODO add in param.h
 
 void main() {
     vec3 col_low = vec3(0, 0.45, 0); //green
     vec3 col_high = vec3(0.3, 0.2, 0);//(102/256, 51/256, 0);
-    float water_limit = 0.15; //water_level;
-    float beach_limit = water_limit + 0.05;
-    float snow_limit = 0.5;
-    float rock_limit = 0.37;
+	float water_limit = WATER_HEIGHT;
+	float beach_limit = BEACH_HEIGHT;
+	float snow_limit = SNOW_HEIGHT;
+	float rock_limit = ROCK_HEIGHT;
 
-    bool colours = false; //use colours
-
-    if (colours == true){
+	if (USE_COLOURS == true){
         if(height <= water_limit) //water
             color = vec3(0.0,0.0,1.0); //blue
         else if((height > rock_limit) && (height < snow_limit)) //rocks
@@ -82,10 +84,13 @@ void main() {
     //Compute diffuse shading.
     vec3 dX = dFdx(vpoint_mv.xyz);
     vec3 dY = dFdy(vpoint_mv.xyz);
-    vec3 n = normalize(cross(dX,dY));
-    vec3 l = normalize(light_dir);
-    float lambert = dot(n,l);
+	vec3 n = normalize(cross(dX,dY));
+	vec3 l = normalize(light_dir);
+	float lambert = dot(n,l);
     if(lambert > 0.0) {//insuring that it's not hidden
         color += Ld*kd*lambert;//diffuse term
-    }
+	}
+	else
+		color = vec3(0,0,0);
+
 }

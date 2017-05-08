@@ -20,7 +20,6 @@ Noise noise;
 Skybox skybox;
 FrameBuffer framebuffer;
 Water water;
-//FrameBuffer water_reflection; // water reflection
 
 int window_width = 800;
 int window_height = 600;
@@ -34,6 +33,8 @@ mat4 old_trackball_matrix;
 mat4 model_matrix;
 
 Trackball trackball;
+
+#include "glm/ext.hpp"
 
 mat4 OrthographicProjection(float left, float right, float bottom,
                             float top, float near, float far) {
@@ -104,9 +105,7 @@ void Init() {
 
     noise.Init();
     skybox.Init();
-    //GLuint framebuffer_texture_id = framebuffer.Init(512, 512);
     GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
-    //GLuint water_reflection_tex_id = water_reflection.Init(window_width, window_height, false);
 
     noise.Init();
     grid.Init(framebuffer_texture_id);
@@ -120,16 +119,19 @@ void Init() {
     // once you use the trackball, you should use a view matrix that
     // looks straight down the -z axis. Otherwise the trackball's rotation gets
     // applied in a rotated coordinate frame.
-    view_matrix = LookAt(vec3(0.0f, 0.0f, 40.0f),
+    // For this reason we apply all the transformations to the model matrix (otherwise we couldn't be able anymore to use the trackball)
+    view_matrix = LookAt(vec3(0.0f, 0.0f, 1.0f),
                          vec3(0.0f, 0.0f, 0.0f),
                          vec3(0.0f, 1.0f, 0.0f));
 
-    view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, 0.0f));
+    //view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, 0.0f)); //use the z axis translation if u want to zoom in/out
 
     trackball_matrix = IDENTITY_MATRIX;
 
-    model_matrix = scale(mat4(1.0f),vec3(60,60,60));
-    model_matrix = translate(model_matrix,vec3(-0.25f, -0.25f, 0.0f));
+    model_matrix = scale(mat4(1.0f),vec3(1,1,1));
+    model_matrix = rotate(model_matrix, -2.3f, vec3(0.0f, 0.0f, 1.0f) /*rot_axe*/); //now the terrain comes against the camera
+    model_matrix = rotate(model_matrix, 0.7f, vec3(1.0f, -1.0f, 0.0f) /*rot_axe*/); //now the terrain is inclinated
+    model_matrix = translate(model_matrix,vec3(-0.1f, -0.1f, 0.0f));
 }
 
 // gets called for every frame.
@@ -137,8 +139,6 @@ void Display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const float time = glfwGetTime();
-    //float water_height_sh = WATER_HEIGHT + WATER_AMPL * sin(time);
-    //float water_height = (water_height_sh + 1) / 2;
 
     framebuffer.Bind();
     {
@@ -147,28 +147,10 @@ void Display() {
     }
     framebuffer.Unbind();
 
-
-//    water_reflection.Bind();
-//    {
-//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        glEnable(GL_CLIP_DISTANCE0);
-
-//        drawChunks(model_matrix, view_matrix_reflection, projection_matrix, curr_time, water_height);
-//        sky.Draw(translate(projection_matrix * model_matrix * view_matrix_reflection, cam_pos2));
-//        drawTrees(model_matrix, view_matrix_reflection, projection_matrix, curr_time, water_height_sh);
-
-//        glDisable(GL_CLIP_DISTANCE0);
-//    }
-//    water_reflection.Unbind();
-    //mat4 model = scale(model_matrix, vec3(WATER_SIZE, 1, WATER_SIZE));
-    //model = translate(model, vec3(cam_pos.x / WATER_SIZE, WATER_HEIGHT, cam_pos.z / WATER_SIZE));
-
     //draw before solid objects, then transparent objects to achive the blending of the colours
     grid.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
     water.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
-    skybox.Draw(trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
-    grid.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
-
+    skybox.Draw(trackball_matrix * model_matrix, view_matrix, projection_matrix);
 
 }
 
@@ -193,6 +175,12 @@ void MouseButton(GLFWwindow* window, int button, int action, int mod) {
         trackball.BeingDrag(p.x, p.y);
         old_trackball_matrix = trackball_matrix;
         // Store the current state of the model matrix.
+
+//        //print the matrixes to see how the trackball is affecting the world
+//        cout<< "view matrix:" <<std::endl;
+//        cout<<glm::to_string(view_matrix)<<std::endl;
+//        cout<< "trackball matrix:" <<std::endl;
+//        cout<<glm::to_string(trackball_matrix)<<std::endl;
     }
 }
 
@@ -202,7 +190,6 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // Calculate 'trackball_matrix' given the return value of
         // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
         // See also the mouse_button(...) function.
-        //trackball_matrix = ...
         trackball_matrix =  trackball.Drag(p.x, p.y) * old_trackball_matrix;
     }
 
@@ -212,7 +199,6 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // moving the mouse cursor up and down (along the screen's y axis)
         // should zoom out and it. For that you have to update the current
         // 'view_matrix' with a translation along the z axis.
-        // view_matrix = ...
         float var;
         var = p.y - last_y;
         view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, var * ZOOM_SENSITIVITY));
@@ -233,7 +219,7 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
     //Use a perspective projection instead;
     projection_matrix = PerspectiveProjection(45.0f,
                                               (GLfloat)window_width / window_height,
-                                              0.1f, 400.0f);
+                                              0.1f, 100.0f);
     framebuffer.Cleanup();
     framebuffer.Init(window_width, window_height);
 }
@@ -242,10 +228,35 @@ void ErrorCallback(int error, const char* description) {
     fputs(description, stderr);
 }
 
+float total_x = 0; //track the total movement along the axis using keyboard
+float total_y = 0;
+
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
+
+    if (key == GLFW_KEY_X && action == GLFW_PRESS) { //move along X axe INCREASE
+        model_matrix = translate(model_matrix,vec3(0.1f, 0.0f, 0.0f));
+        total_x += 0.1f;
+    }
+    if (key == GLFW_KEY_C && action == GLFW_PRESS) { //move along X axe DECREASE
+        model_matrix = translate(model_matrix,vec3(-0.1f, 0.0f, 0.0f));
+        total_x -= 0.1f;
+    }
+
+    if (key == GLFW_KEY_Y && action == GLFW_PRESS) { //move along Y axe
+        model_matrix = translate(model_matrix,vec3(0.0f, 0.1f, 0.0f)); //INCREASE
+        total_y += 0.1f;
+    }
+    if (key == GLFW_KEY_U && action == GLFW_PRESS) { //move along Y axe
+        model_matrix = translate(model_matrix,vec3(0.0f, -0.1f, 0.0f)); //DECREASE
+        total_y -= 0.1f;
+    }
+
+    //cout << "total x: " << total_x << endl;
+    //cout << "total y: " << total_y << endl;
+
 }
 
 
@@ -298,13 +309,14 @@ int main(int argc, char *argv[]) {
 
     cout << "OpenGL" << glGetString(GL_VERSION) << endl;
 
-    // initialize our OpenGL program
-    Init();
-
     // update the window size with the framebuffer size (on hidpi screens the
     // framebuffer is bigger)
     glfwGetFramebufferSize(window, &window_width, &window_height);
     SetupProjection(window, window_width, window_height);
+
+    // initialize our OpenGL program
+    Init();
+
 
     // render loop
     while(!glfwWindowShouldClose(window)){

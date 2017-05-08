@@ -33,30 +33,52 @@ class Water {
 
         // vertex coordinates and indices
         {
-            vector<GLfloat> vertices;
-            vector<GLuint> indices;
-            int grid_dim = 256;
+            std::vector<GLfloat> vertices;
+            std::vector<GLuint> indices;
 
-            float half = grid_dim / 2.0;
+            float min_pos = -1.0; //from -1 to 1
+            float pos_range = 2.0;
 
-            for (int i = 0; i <= grid_dim; i++) {
-                for (int j = 0; j <= grid_dim; j++) {
-                    vertices.push_back((i - half) / half);
-                    vertices.push_back((j - half) / half);
+            int xLength = WATER_DIM;
+            int yLength = WATER_DIM;
+
+            int offset = 0;
+
+            // First, build the data for the vertex buffer
+            for (int y = 0; y < yLength; y++) {
+                for (int x = 0; x < xLength; x++) {
+                    float xRatio = x / (float) (xLength - 1);
+
+                    // Build our grid from the top down, so that our triangles are
+                    // counter-clockwise.
+                    float yRatio = 1.0f - (y / (float) (yLength - 1));
+
+                    vertices.push_back(min_pos + (xRatio * pos_range));
+                    vertices.push_back(min_pos + (yRatio * pos_range));
                 }
             }
 
-            for (int i = 0; i < grid_dim; i++) {
-                for (int j = 0; j < grid_dim; j++) {
-                    int ind = (grid_dim + 1) * i + j;
-                    // cout << ind << "\n";
-                    indices.push_back(0 + ind);
-                    indices.push_back(1 + ind);
-                    indices.push_back(grid_dim + 1 + ind);
+            // Now build the index data
+            int numStripsRequired = yLength - 1;
+            int numDegensRequired = 2 * (numStripsRequired - 1);
 
-                    indices.push_back(1 + ind);
-                    indices.push_back(grid_dim + 1 + ind);
-                    indices.push_back(grid_dim + 2 + ind);
+            offset = 0;
+
+            for (int y = 0; y < yLength - 1; y++) {
+                if (y > 0) {
+                    // Degenerate begin: repeat first vertex
+                    indices.push_back(y * yLength);
+                }
+
+                for (int x = 0; x < xLength; x++) {
+                    // One part of the strip
+                    indices.push_back((y * yLength) + x);
+                    indices.push_back(((y + 1) * yLength) + x);
+                }
+
+                if (y < yLength - 2) {
+                    // Degenerate end: repeat last vertex
+                    indices.push_back(((y + 1) * yLength) + (xLength - 1));
                 }
             }
 
@@ -65,19 +87,23 @@ class Water {
             // position buffer
             glGenBuffers(1, &vertex_buffer_object_position_);
             glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_position_);
-            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat),
+                         &vertices[0], GL_STATIC_DRAW);
 
             // vertex indices
             glGenBuffers(1, &vertex_buffer_object_index_);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer_object_index_);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint),
+                         &indices[0], GL_STATIC_DRAW);
 
             // position shader attribute
             GLuint loc_position = glGetAttribLocation(program_id_, "position");
             glEnableVertexAttribArray(loc_position);
-            glVertexAttribPointer(loc_position, 2, GL_FLOAT, DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+            glVertexAttribPointer(loc_position, 2, GL_FLOAT, DONT_NORMALIZE,
+                                  ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 
+        // textures
         {
             initTexture("water_texture.tga", &water_texture_id_, "water", GL_TEXTURE0);
         }
@@ -85,8 +111,9 @@ class Water {
         // other uniforms
         MVP_id_ = glGetUniformLocation(program_id_, "MVP");
         MV_id_ = glGetUniformLocation(program_id_, "MV");
-
-        glUniform1f(glGetUniformLocation(program_id_, "water_height"), WATER_HEIGHT);
+        glUniform1f(glGetUniformLocation(program_id_, "WATER_HEIGHT"), WATER_HEIGHT);
+        glUniform1f(glGetUniformLocation(program_id_, "SPEED"), SPEED);
+        glUniform3fv(glGetUniformLocation(program_id_, "LIGHT_POS"), 3,  value_ptr(LIGHT_POS));
         time_id_ = glGetUniformLocation(program_id_, "time");
 
         // to avoid the current object being polluted
@@ -127,7 +154,7 @@ class Water {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glDrawElements(GL_TRIANGLES, num_indices_, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLE_STRIP, num_indices_, GL_UNSIGNED_INT, 0);
 
         glDisable(GL_BLEND);
 
@@ -142,7 +169,6 @@ class Water {
         int height;
         int nb_component;
         // set stb_image to have the same coordinates as OpenGL
-        //stbi_set_flip_vertically_on_load(1);
         unsigned char *image = stbi_load(filename.c_str(), &width, &height, &nb_component, 0);
 
         if (image == nullptr) {

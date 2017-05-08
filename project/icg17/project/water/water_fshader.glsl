@@ -13,11 +13,14 @@ uniform float time;
 
 void main() {
 
+	//TODO add in param.h all the shading coeff
 	float Ld = 0.2;
 	float Ls = 0.1;
 
 	//taking color from texture
-	color = vec4(texture(water,uv).rgb, 0.5);
+	//TODO implement reflection, adding alpha to param.h not important since
+	//     with the reflection we will not use it anymore
+	color = vec4(texture(water,uv).rgb, 0.5); //ALPHA 0.5
 
 	//Compute diffuse shading.
 	vec3 dX = dFdx(view_dir.xyz);
@@ -35,5 +38,7 @@ void main() {
 		color += Ld*lambert;//diffuse term
 		color += vec4(1) * (rv * Ls); //specular term
 	}
+	else
+		color = vec4(0,0,0,0);
 
 }

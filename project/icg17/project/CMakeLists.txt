@@ -7,7 +7,7 @@ file(GLOB_RECURSE HEADERS "*.h")
 # these files are copied only once
 file(GLOB TEXTURES
 	grid/*.tga
-	water/*.tga)
+	water/*.tga
 	skybox/*.png)
 
 copy_files_once(${TEXTURES})
@@ -20,7 +20,7 @@ file(GLOB SHADERS
   noise/noise_vshader.glsl
   noise/noise_fshader.glsl
   water/water_vshader.glsl
-  water/water_fshader.glsl)
+  water/water_fshader.glsl
   skybox/skybox_vshader.glsl
   skybox/skybox_fshader.glsl)
 

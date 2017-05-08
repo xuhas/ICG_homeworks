@@ -1,6 +1,7 @@
 #pragma once
 #include "icg_helper.h"
 #include <glm/gtc/type_ptr.hpp>
+#include "../param.h"
 
 class Grid {
 
@@ -73,76 +74,49 @@ public:
             std::vector<GLfloat> vertices;
             std::vector<GLuint> indices;
 
-            bool use_new = true;
+            float min_pos = -1.0; //from -1 to 1
+            float pos_range = 2.0;
 
-            if (use_new){ //use new grid
-                int grid_dim = 512;
-                float min_pos = -1.0;
-                float pos_range = 2.0;
+            int xLength = GRID_DIM;
+            int yLength = GRID_DIM;
 
-                int xLength = grid_dim;
-                int yLength = grid_dim;
+            int offset = 0;
 
-                int offset = 0;
+            // First, build the data for the vertex buffer
+            for (int y = 0; y < yLength; y++) {
+                for (int x = 0; x < xLength; x++) {
+                    float xRatio = x / (float) (xLength - 1);
 
-                // First, build the data for the vertex buffer
-                for (int y = 0; y < yLength; y++) {
-                    for (int x = 0; x < xLength; x++) {
-                        float xRatio = x / (float) (xLength - 1);
+                    // Build our grid from the top down, so that our triangles are
+                    // counter-clockwise.
+                    float yRatio = 1.0f - (y / (float) (yLength - 1));
 
-                        // Build our heightmap from the top down, so that our triangles are
-                        // counter-clockwise.
-                        float yRatio = 1.0f - (y / (float) (yLength - 1));
-
-                        vertices.push_back(min_pos + (xRatio * pos_range));
-                        vertices.push_back(min_pos + (yRatio * pos_range));
-                    }
-                }
-
-                // Now build the index data
-                int numStripsRequired = yLength - 1;
-                int numDegensRequired = 2 * (numStripsRequired - 1);
-
-                offset = 0;
-
-                for (int y = 0; y < yLength - 1; y++) {
-                    if (y > 0) {
-                        // Degenerate begin: repeat first vertex
-                        indices.push_back(y * yLength);
-                    }
-
-                    for (int x = 0; x < xLength; x++) {
-                        // One part of the strip
-                        indices.push_back((y * yLength) + x);
-                        indices.push_back(((y + 1) * yLength) + x);
-                    }
-
-                    if (y < yLength - 2) {
-                        // Degenerate end: repeat last vertex
-                        indices.push_back(((y + 1) * yLength) + (xLength - 1));
-                    }
+                    vertices.push_back(min_pos + (xRatio * pos_range));
+                    vertices.push_back(min_pos + (yRatio * pos_range));
                 }
             }
-            else{ //else use old grid
-                int k=0;
-                float i = -1.0f;
-                for(float j = 1.0f ; j>= -1.0f ; j-=0.01f){
 
-                    for( i = -1.0f ; i <= 1.0f ; i+=0.01f){
-                        vertices.push_back(i); vertices.push_back( j);
-                        vertices.push_back( i); vertices.push_back(j - 0.01f);
-                        vertices.push_back( i + 0.01f); vertices.push_back( j);
-                        vertices.push_back(i-0.01f); vertices.push_back(j-0.01f);
+            // Now build the index data
+            int numStripsRequired = yLength - 1;
+            int numDegensRequired = 2 * (numStripsRequired - 1);
 
-                        indices.push_back(k);
-                        indices.push_back(k+1);
-                        indices.push_back(k+2);
-                        indices.push_back(k+3);
+            offset = 0;
 
-                        k+=4;
+            for (int y = 0; y < yLength - 1; y++) {
+                if (y > 0) {
+                    // Degenerate begin: repeat first vertex
+                    indices.push_back(y * yLength);
+                }
 
-                    }
-                    //vertices.last()=; vertices.push_back(j-0.01f);
+                for (int x = 0; x < xLength; x++) {
+                    // One part of the strip
+                    indices.push_back((y * yLength) + x);
+                    indices.push_back(((y + 1) * yLength) + x);
+                }
+
+                if (y < yLength - 2) {
+                    // Degenerate end: repeat last vertex
+                    indices.push_back(((y + 1) * yLength) + (xLength - 1));
                 }
             }
 
@@ -166,8 +140,6 @@ public:
             glVertexAttribPointer(loc_position, 2, GL_FLOAT, DONT_NORMALIZE,
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
-
-
 
         // texture coordinates
         {
@@ -222,6 +194,13 @@ public:
 
         // other uniforms
         MVP_id_ = glGetUniformLocation(program_id_, "MVP");
+        glUniform1f(glGetUniformLocation(program_id_, "SPEED"), SPEED);
+        glUniform3fv(glGetUniformLocation(program_id_, "LIGHT_POS"), 3,  value_ptr(LIGHT_POS));
+        glUniform1f(glGetUniformLocation(program_id_, "WATER_HEIGHT"), WATER_HEIGHT);
+        glUniform1f(glGetUniformLocation(program_id_, "BEACH_HEIGHT"), BEACH_HEIGHT);
+        glUniform1f(glGetUniformLocation(program_id_, "ROCK_HEIGHT"), ROCK_HEIGHT);
+        glUniform1f(glGetUniformLocation(program_id_, "SNOW_HEIGHT"), SNOW_HEIGHT);
+        glUniform1i(glGetUniformLocation(program_id_, "USE_COLOURS"), USE_COLOURS ? 1 : 0);
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
