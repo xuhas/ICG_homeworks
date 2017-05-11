@@ -6,6 +6,7 @@ out vec3 color;
 
 uniform mat4 MVP;
 uniform float time;
+uniform float SPEED; //param.h
 
 vec2 position;
 
@@ -42,14 +43,8 @@ float fbm(vec2 x) {
     return v;
 }
 
-void main() {
-    float speedt = 0.5;
-    float speedw = 1;
-    float water_level=0.15;
+void main(){
     vec2 position = (uv + vec2(1.0, 1.0)) * 5;
-    float height = fbm(position/5-time*speedt);
-//    if(height<water_level){
-//        height = water_level+fbm(uv*2+time*speedw/50)/100;//adjust inside fbm for movement of water
-//    }
+    float height = fbm(position/5-time*SPEED)-0.25;
     color = vec3(height, 0.0f, 0.0f);
 }

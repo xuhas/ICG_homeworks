@@ -1,6 +1,7 @@
 #pragma once
 #include "icg_helper.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "../param.h"
 
 class Noise {
 
@@ -41,7 +42,10 @@ public:
             glEnableVertexAttribArray(vertex_point_id);
             glVertexAttribPointer(vertex_point_id, 3, GL_FLOAT, DONT_NORMALIZE,
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+
         }
+        //Other uniforms
+        glUniform1f(glGetUniformLocation(program_id_, "SPEED"), SPEED);
 
         // to avoid the current object being polluted
         glBindVertexArray(0);

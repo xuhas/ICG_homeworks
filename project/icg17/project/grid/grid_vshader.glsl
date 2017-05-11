@@ -18,10 +18,9 @@ out vec4 vpoint_mv;
 out vec2 uv;
 
 void main() {
-    float speedt = 0.5;
-	//float speedw = 1;
+
 	uv = (position + vec2(1.0, 1.0)) * 0.5; //now uv goes from 0.0 to 1.0
-    height = texture(tex, uv).x;
+        height = texture(tex, uv).x;
 
 	uv = uv * 2 - time * SPEED; //TODO TRY TO REMOVE THE *2
 

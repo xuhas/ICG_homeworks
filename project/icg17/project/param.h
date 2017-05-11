@@ -3,8 +3,8 @@
 //grid
 #define GRID_DIM 512
 #define LIGHT_POS glm::vec3(0.0f, 0.0f, 2.0f)
-#define SPEED 0.5f
-#define WATER_HEIGHT 0.15f
+#define SPEED 0.1f
+#define WATER_HEIGHT 0.15f-0.25
 #define BEACH_HEIGHT WATER_HEIGHT+0.05f
 #define ROCK_HEIGHT 0.37f
 #define SNOW_HEIGHT 0.5f
