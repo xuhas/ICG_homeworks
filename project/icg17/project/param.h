@@ -5,9 +5,9 @@
 #define LIGHT_POS glm::vec3(0.0f, 0.0f, 2.0f)
 #define SPEED 0.1
 #define WATER_HEIGHT 0.05f-0.15
-#define BEACH_HEIGHT WATER_HEIGHT+0.05f
-#define ROCK_HEIGHT BEACH_HEIGHT+0.10f
-#define SNOW_HEIGHT ROCK_HEIGHT + 0.15f
+#define BEACH_HEIGHT WATER_HEIGHT+0.015f
+#define ROCK_HEIGHT BEACH_HEIGHT+0.1f
+#define SNOW_HEIGHT ROCK_HEIGHT + 0.05f
 #define USE_COLOURS false
 
 //main

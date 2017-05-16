@@ -22,7 +22,7 @@ void main() {
 	uv = (position + vec2(1.0, 1.0)) * 0.5; //now uv goes from 0.0 to 1.0
         height = texture(tex, uv).x;
 
-	uv = uv * 2 - time * SPEED; //TODO TRY TO REMOVE THE *2
+        uv = uv*3 - time * SPEED; //TODO TRY TO REMOVE THE *2
 
 	vec3 pos_3d = vec3(position.x, position.y, height);
 
