@@ -122,7 +122,7 @@ void Init() {
     // For this reason we apply all the transformations to the model matrix (otherwise we couldn't be able anymore to use the trackball)
     view_matrix = LookAt(vec3(0.0f, 0.0f, 1.0f),
                          vec3(0.0f, 0.0f, 0.0f),
-                         vec3(0.0f, 1.0f, 0.0f));
+                         vec3(0.0f, 1.0f, 1.0f));
 
     //view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, 0.0f)); //use the z axis translation if u want to zoom in/out
 
