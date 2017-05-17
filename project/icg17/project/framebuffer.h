@@ -24,7 +24,7 @@ class FrameBuffer {
             //glViewport(0, 0, 800, 600);
         }
 
-        int Init(int image_width, int image_height, bool use_interpolation = false) {
+        int Init(int image_width, int image_height, bool use_interpolation = false, int water_refl = 0) {
             this->width_ = image_width;
             this->height_ = image_height;
 
@@ -44,9 +44,12 @@ class FrameBuffer {
                 }
 
                 // create texture for the color attachment
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width_, height_, 0,
+                if (water_refl)
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width_, height_, 0,
+                                 GL_RGBA, GL_FLOAT, NULL);
+                else
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width_, height_, 0,
                              GL_RED, GL_FLOAT, NULL);
-                // how to load from buffer
             }
 
             // create render buffer (for depth channel)

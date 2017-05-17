@@ -21,9 +21,10 @@ void main() {
 
 	gl_Position = MVP * vec4(pos_3d, 1);
 
-	//diffuse shading.
 	///compute the light direction light_dir
     vec4 vpoint_mv = MV * vec4(pos_3d, 1.0);
+	vec4 light_mv = MV * vec4(LIGHT_POS, 1.0);
+
 	view_dir = normalize(-vpoint_mv.xyz);
-	light_dir = normalize(LIGHT_POS.xyz - vpoint_mv.xyz);
+	light_dir = normalize(light_mv.xyz - vpoint_mv.xyz);
 }

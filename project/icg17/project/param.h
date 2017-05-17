@@ -2,12 +2,12 @@
 
 //grid
 #define GRID_DIM 512
-#define LIGHT_POS glm::vec3(0.0f, 0.0f, 2.0f)
+#define LIGHT_POS glm::vec3(1.0f, 1.0f, 2.0f)
 #define SPEED 0.1f
-#define WATER_HEIGHT 0.15f-0.25
-#define BEACH_HEIGHT WATER_HEIGHT+0.05f
-#define ROCK_HEIGHT 0.37f
-#define SNOW_HEIGHT 0.5f
+#define WATER_HEIGHT -0.1f
+#define BEACH_HEIGHT WATER_HEIGHT+0.05f  // -0.05 ABSOLUTE VALUES
+#define ROCK_HEIGHT BEACH_HEIGHT+0.17f   //  0.12
+#define SNOW_HEIGHT ROCK_HEIGHT+0.13f    //  0.25
 #define USE_COLOURS false
 
 //main

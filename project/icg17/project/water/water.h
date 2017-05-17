@@ -10,15 +10,15 @@ class Water {
     GLuint vertex_buffer_object_position_; // memory buffer for positions
     GLuint vertex_buffer_object_index_;    // memory buffer for indices
     GLuint program_id_;                    // GLSL shader program ID
-    GLuint water_texture_id_;             // normal texture ID
+    GLuint water_texture_id_;              // normal texture ID
+    GLuint water_reflection_id_;           // reflection texture ID
     GLuint num_indices_;                   // number of vertices to render
     GLuint MVP_id_;                        // model, view, proj matrix ID
     GLuint MV_id_;
     GLuint time_id_;
-    GLuint tex_reflection_id_;
 
   public:
-    void Init(GLuint tex_reflection_id) {
+    void Init(GLuint water_reflection_id) {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("water_vshader.glsl", "water_fshader.glsl");
         if (!program_id_) {
@@ -108,6 +108,10 @@ class Water {
             initTexture("water_texture.tga", &water_texture_id_, "water", GL_TEXTURE0);
         }
 
+        // load/Assign texture
+        water_reflection_id_ = water_reflection_id;
+        glUniform1i(glGetUniformLocation(program_id_, "water_reflect"), 1 /*GL_TEXTURE1*/);
+
         // other uniforms
         MVP_id_ = glGetUniformLocation(program_id_, "MVP");
         MV_id_ = glGetUniformLocation(program_id_, "MV");
@@ -129,6 +133,7 @@ class Water {
         glDeleteVertexArrays(1, &vertex_array_id_);
         glDeleteProgram(program_id_);
         glDeleteTextures(1, &water_texture_id_);
+        glDeleteTextures(1, &water_reflection_id_);
     }
 
     void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX, const glm::mat4 &view = IDENTITY_MATRIX,
@@ -140,6 +145,8 @@ class Water {
         // bind textures
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, water_texture_id_);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, water_reflection_id_);
 
         // setup MVP
         glm::mat4 MVP = projection * view * model;
@@ -188,10 +195,10 @@ class Water {
 
         GLuint tex_id = glGetUniformLocation(program_id_, texture_name.c_str());
         glUseProgram(program_id_);
-        glUniform1i(tex_id, val - GL_TEXTURE0);
+        glUniform1i(tex_id, val - GL_TEXTURE0); //why - GL_TEXTURE0?
 
         // cleanup
-        glBindTexture(GL_TEXTURE_2D, val);
+        glBindTexture(GL_TEXTURE_2D, val); //why not bind 0??
         stbi_image_free(image);
     }
 };
