@@ -5,9 +5,14 @@
 #define LIGHT_POS glm::vec3(0.0f, 0.0f, 3.0f)
 #define SPEED 0.1f
 #define WATER_HEIGHT 0.0f //before was -0.1f //IT HAS TO BE ZERO, OTHERWISE YOU FUCK UP THE REFLECTION
-#define BEACH_HEIGHT WATER_HEIGHT+0.05f  // 0.05 ABSOLUTE VALUES
-#define ROCK_HEIGHT BEACH_HEIGHT+0.17f   //  0.22
-#define SNOW_HEIGHT ROCK_HEIGHT+0.13f    //  0.35
+#define BEACH_HEIGHT WATER_HEIGHT+0.015f  // 0.05 ABSOLUTE VALUES
+#define ROCK_HEIGHT BEACH_HEIGHT+0.1f   //  0.22
+#define SNOW_HEIGHT ROCK_HEIGHT+0.05f    //  0.35
+
+//======= it has to be zero for the reflection
+//#define WATER_HEIGHT 0.05f-0.15
+//>>>>>>> master
+
 #define USE_COLOURS false
 
 //main

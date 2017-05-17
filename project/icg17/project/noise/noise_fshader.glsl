@@ -1,4 +1,12 @@
 #version 330
+/* Most of the code in inspired from an article on github:
+https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+
+We have tried and tested many different noise patterns and these are the
+ones that give a good result. At first, it may seem taht the result of the
+noise is deterministic but since there is a time variable, it can vary every run.
+We can switch from perlin noise and fractal Brownian noise by changind the
+function in the main. We may implement changing by key later on*/
 
 in vec2 uv;
 
@@ -10,13 +18,15 @@ uniform float SPEED; //param.h
 
 vec2 position;
 
-//fractional brownian
-int NUM_OCTAVES=6;
+//fractional brownian octaves
+int NUM_OCTAVES=100;
 
+//A rand function
 float rand(vec2 n) {
     return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
 }
 
+//Some Perlin noise fuction
 float noise(vec2 p){
     vec2 ip = floor(p);
     vec2 u = fract(p);
@@ -43,8 +53,22 @@ float fbm(vec2 x) {
     return v;
 }
 
+
+
+
+
 void main(){
-	vec2 position = (uv + vec2(1.0, 1.0));
-	float height = fbm(position-time*SPEED)-0.25;
+
+    vec2 position = (uv + vec2(1.0, 1.0)) * 5;
+    vec2 norm_pos = normalize(uv) ;
+//    float height = fbm(position/5-time*SPEED)/3 -0.15;
+    float height = fbm(uv*1.5-time*SPEED)/2.5 -0.15;
+    
     color = vec3(height, 0.0f, 0.0f);
 }
+
+
+
+
+
+
