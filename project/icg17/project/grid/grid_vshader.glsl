@@ -1,6 +1,4 @@
 #version 330
-//#include <GLFW/glfw3.h>
-//#include<stdlib.h>
 
 in vec2 position;
 
@@ -20,18 +18,19 @@ out vec2 uv;
 void main() {
 
 	uv = (position + vec2(1.0, 1.0)) * 0.5; //now uv goes from 0.0 to 1.0
-        height = texture(tex, uv).x;
 
-        uv = uv*3 - time * SPEED; //TODO TRY TO REMOVE THE *2
+	height = texture(tex, uv).x;
+
+	uv = uv * 3 - time * SPEED;
 
 	vec3 pos_3d = vec3(position.x, position.y, height);
 
 	gl_Position = MVP * vec4(pos_3d, 1.0);
 
-
-    //diffuse shading.
     ///compute the light direction light_dir
     mat4 MV = view * model;
     vpoint_mv = MV * vec4(pos_3d, 1.0);
-	light_dir = normalize(LIGHT_POS.xyz - vpoint_mv.xyz);
+	vec4 light_mv = MV * vec4(LIGHT_POS, 1.0);
+
+	light_dir = normalize(light_mv.xyz - vpoint_mv.xyz);
 }

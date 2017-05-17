@@ -200,7 +200,7 @@ public:
         glUniform1f(glGetUniformLocation(program_id_, "BEACH_HEIGHT"), BEACH_HEIGHT);
         glUniform1f(glGetUniformLocation(program_id_, "ROCK_HEIGHT"), ROCK_HEIGHT);
         glUniform1f(glGetUniformLocation(program_id_, "SNOW_HEIGHT"), SNOW_HEIGHT);
-        glUniform1i(glGetUniformLocation(program_id_, "USE_COLOURS"), USE_COLOURS ? 1 : 0);
+        glUniform1i(glGetUniformLocation(program_id_, "USE_COLOURS"), USE_COLOURS ? 1 : 0);        
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
@@ -220,9 +220,11 @@ public:
 
     void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
-              const glm::mat4 &projection = IDENTITY_MATRIX) {
+              const glm::mat4 &projection = IDENTITY_MATRIX, bool draw_sand = true) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
+
+        glUniform1i(glGetUniformLocation(program_id_, "draw_sand"), draw_sand ? 1 : 0);
 
         // bind textures
         glActiveTexture(GL_TEXTURE0);

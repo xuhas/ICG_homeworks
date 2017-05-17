@@ -15,14 +15,22 @@
 #include "water/water.h"
 #include "param.h"
 
+#define WATER_REFLECTION 1
+#define NOT_DRAW_SAND false
+
+
 Grid grid;
 Noise noise;
 Skybox skybox;
-FrameBuffer framebuffer;
+FrameBuffer noise_framebuffer;
+FrameBuffer water_refl;
 Water water;
+Trackball trackball;
 
 int window_width = 800;
 int window_height = 600;
+bool pause = false;
+float stop_time = 0;
 
 using namespace glm;
 
@@ -31,8 +39,8 @@ mat4 view_matrix;
 mat4 trackball_matrix;
 mat4 old_trackball_matrix;
 mat4 model_matrix;
-
-Trackball trackball;
+vec3 cam_pos;
+vec3 view_pos;
 
 #include "glm/ext.hpp"
 
@@ -68,9 +76,7 @@ mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     vec4 C3(0.0f);
 
     C0[0] = 2 * near / (right - left);
-
     C1[1] = 2 * near / (top - bottom);
-
     C2[0] = (right + left) / (right - left);
     C2[1] = (top + bottom) / (top - bottom);
     C2[2] = -(far + near) / (far - near);
@@ -103,15 +109,12 @@ void Init() {
     // sets background color
     glClearColor(0.9, 0.9, 1.0 /*gray*/, 0.5 /*solid*/);
 
-    noise.Init();
     skybox.Init();
-    GLuint framebuffer_texture_id = framebuffer.Init(window_width, window_height);
-
     noise.Init();
-    grid.Init(framebuffer_texture_id);
-    //water.Init(water_reflection_tex_id);
-    water.Init(framebuffer_texture_id);
-
+    GLuint framebuffer_noise_id = noise_framebuffer.Init(window_width, window_height,true);
+    GLuint framebuffer_water_refl_id = water_refl.Init(window_width,window_height,false, WATER_REFLECTION);
+    grid.Init(framebuffer_noise_id);
+    water.Init(framebuffer_water_refl_id);
 
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
@@ -119,38 +122,70 @@ void Init() {
     // once you use the trackball, you should use a view matrix that
     // looks straight down the -z axis. Otherwise the trackball's rotation gets
     // applied in a rotated coordinate frame.
-    // For this reason we apply all the transformations to the model matrix (otherwise we couldn't be able anymore to use the trackball)
-    view_matrix = LookAt(vec3(0.0f, 0.0f, 1.0f),
-                         vec3(0.0f, 0.0f, 0.0f),
-                         vec3(0.0f, 1.0f, 1.0f));
-
-    //view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, 0.0f)); //use the z axis translation if u want to zoom in/out
+    cam_pos = vec3(0.0f, 0.0f, 1.0f);
+    view_pos = vec3(0.0f, 0.0f, 0.0f);
 
     trackball_matrix = IDENTITY_MATRIX;
+    model_matrix = IDENTITY_MATRIX;
 
-    model_matrix = scale(mat4(1.0f),vec3(1,1,1));
-    model_matrix = rotate(model_matrix, -2.3f, vec3(0.0f, 0.0f, 1.0f) /*rot_axe*/); //now the terrain comes against the camera
-    model_matrix = rotate(model_matrix, 0.7f, vec3(1.0f, -1.0f, 0.0f) /*rot_axe*/); //now the terrain is inclinated
-    model_matrix = translate(model_matrix,vec3(-0.1f, -0.1f, 0.0f));
+    //infinite terrain view: uncomment these lines
+    //model_matrix = rotate(model_matrix, -2.3f, vec3(0.0f, 0.0f, 1.0f) /*rot_axe*/); //now the terrain comes against the camera
+    //model_matrix = rotate(model_matrix, 0.7f, vec3(1.0f, -1.0f, 0.0f) /*rot_axe*/); //now the terrain is inclinated
+    //model_matrix = translate(model_matrix,vec3(-0.1f, -0.1f, 0.0f));
+}
+
+//prints every second the FPS
+void calculate_fps(float time_now){
+    static float n_frames = 0;
+    static float time_last_print = 0;
+    n_frames++;
+
+    if (time_now - time_last_print >= 1.0) {
+        cout << n_frames << " FPS" << endl;
+        n_frames = 0;
+        time_last_print = time_now;
+    }
 }
 
 // gets called for every frame.
 void Display() {
+    //calculate the FPS
+    float time = (float)glfwGetTime();
+    calculate_fps(time);
+    if (pause)
+        time = stop_time;
+    //if we write every frame the view_matrix, we lose the zoom feature
+    view_matrix = lookAt(cam_pos, view_pos, vec3(0.0f,1.0f,0.0f));
+
+    //a matrix to do the reflection
+    mat4 ref = mat4(1);
+    ref[2][2]=-3;
+
+    // create new VP for mirrored camera
+    mat4 mirror_V_matrix = view_matrix * ref;
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const float time = glfwGetTime();
-
-    framebuffer.Bind();
+    noise_framebuffer.Bind();
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         noise.Draw(time, IDENTITY_MATRIX, view_matrix, projection_matrix);
     }
-    framebuffer.Unbind();
+    noise_framebuffer.Unbind();
+
+    water_refl.Bind();
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        skybox.Draw(model_matrix, trackball_matrix * mirror_V_matrix, projection_matrix);
+        grid.Draw(time, model_matrix, trackball_matrix * mirror_V_matrix, projection_matrix, NOT_DRAW_SAND);
+    }
+    water_refl.Unbind();
 
     //draw before solid objects, then transparent objects to achive the blending of the colours
-    grid.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
-    water.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
-    skybox.Draw(trackball_matrix * model_matrix, view_matrix, projection_matrix);
+    grid.Draw(time, model_matrix, trackball_matrix * view_matrix, projection_matrix);
+    water.Draw(time, model_matrix, trackball_matrix * view_matrix, projection_matrix);
+    skybox.Draw(model_matrix, trackball_matrix * view_matrix, projection_matrix);
 
 }
 
@@ -164,8 +199,6 @@ vec2 TransformScreenCoords(GLFWwindow* window, int x, int y) {
     return vec2(2.0f * (float)x / width - 1.0f,
                 1.0f - 2.0f * (float)y / height);
 }
-
-float last_y = 0;
 
 void MouseButton(GLFWwindow* window, int button, int action, int mod) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
@@ -185,6 +218,7 @@ void MouseButton(GLFWwindow* window, int button, int action, int mod) {
 }
 
 void MousePos(GLFWwindow* window, double x, double y) {
+    static float last_y = 0;
     vec2 p = TransformScreenCoords(window, x, y);
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         // Calculate 'trackball_matrix' given the return value of
@@ -201,7 +235,7 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // 'view_matrix' with a translation along the z axis.
         float var;
         var = p.y - last_y;
-        view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, var * ZOOM_SENSITIVITY));
+        trackball_matrix = translate(trackball_matrix, vec3(0.0f, 0.0f, var * ZOOM_SENSITIVITY));
     }
     last_y = p.y;
 }
@@ -220,45 +254,44 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
     projection_matrix = PerspectiveProjection(45.0f,
                                               (GLfloat)window_width / window_height,
                                               0.1f, 100.0f);
-    framebuffer.Cleanup();
-    framebuffer.Init(window_width, window_height);
+    noise_framebuffer.Cleanup();
+    water_refl.Cleanup();
+    water_refl.Init(window_width, window_height);
+    noise_framebuffer.Init(window_width, window_height);
 }
 
 void ErrorCallback(int error, const char* description) {
     fputs(description, stderr);
 }
 
-float total_x = 0; //track the total movement along the axis using keyboard
-float total_y = 0;
-
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
 
-    if (key == GLFW_KEY_X && action == GLFW_PRESS) { //move along X axe INCREASE
-        model_matrix = translate(model_matrix,vec3(0.1f, 0.0f, 0.0f));
-        total_x += 0.1f;
-    }
-    if (key == GLFW_KEY_C && action == GLFW_PRESS) { //move along X axe DECREASE
-        model_matrix = translate(model_matrix,vec3(-0.1f, 0.0f, 0.0f));
-        total_x -= 0.1f;
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) { //enable/disable stop time
+        pause = !pause;
+        stop_time = (float)glfwGetTime();
+
     }
 
-    if (key == GLFW_KEY_Y && action == GLFW_PRESS) { //move along Y axe
-        model_matrix = translate(model_matrix,vec3(0.0f, 0.1f, 0.0f)); //INCREASE
-        total_y += 0.1f;
-    }
-    if (key == GLFW_KEY_U && action == GLFW_PRESS) { //move along Y axe
-        model_matrix = translate(model_matrix,vec3(0.0f, -0.1f, 0.0f)); //DECREASE
-        total_y -= 0.1f;
-    }
+    //MODEL matrix movements
+    {
+        if (key == GLFW_KEY_A && action == GLFW_PRESS) { //MODEL X axe INCREASE - LEFT
+            model_matrix = translate(model_matrix,vec3(0.1f, 0.0f, 0.0f));
+        }
+        if (key == GLFW_KEY_D && action == GLFW_PRESS) { //MODEL X axe DECREASE - RIGHT
+            model_matrix = translate(model_matrix,vec3(-0.1f, 0.0f, 0.0f));
+        }
 
-    //cout << "total x: " << total_x << endl;
-    //cout << "total y: " << total_y << endl;
-
+        if (key == GLFW_KEY_S && action == GLFW_PRESS) { //MODEL Y axe INCREASE - BACK
+            model_matrix = translate(model_matrix,vec3(0.0f, 0.1f, 0.0f));
+        }
+        if (key == GLFW_KEY_W && action == GLFW_PRESS) { //MODEL Y axe DECREASE - FORWARD
+            model_matrix = translate(model_matrix,vec3(0.0f, -0.1f, 0.0f));
+        }
+    }
 }
-
 
 int main(int argc, char *argv[]) {
     // GLFW Initialization
@@ -312,11 +345,11 @@ int main(int argc, char *argv[]) {
     // update the window size with the framebuffer size (on hidpi screens the
     // framebuffer is bigger)
     glfwGetFramebufferSize(window, &window_width, &window_height);
+    //set projection matrix
     SetupProjection(window, window_width, window_height);
 
     // initialize our OpenGL program
     Init();
-
 
     // render loop
     while(!glfwWindowShouldClose(window)){
@@ -325,10 +358,10 @@ int main(int argc, char *argv[]) {
         glfwPollEvents();
     }
 
-
     noise.Cleanup();
     skybox.Cleanup();
-    framebuffer.Cleanup();
+    noise_framebuffer.Cleanup();
+    water_refl.Cleanup();
     grid.Cleanup();
 
     // close OpenGL window and terminate GLFW

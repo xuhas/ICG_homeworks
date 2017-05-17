@@ -58,10 +58,12 @@ float fbm(vec2 x) {
 
 
 void main(){
+
     vec2 position = (uv + vec2(1.0, 1.0)) * 5;
     vec2 norm_pos = normalize(uv) ;
 //    float height = fbm(position/5-time*SPEED)/3 -0.15;
     float height = fbm(uv*1.5-time*SPEED)/2.5 -0.15;
+    
     color = vec3(height, 0.0f, 0.0f);
 }
 
