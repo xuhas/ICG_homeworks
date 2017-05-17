@@ -84,7 +84,7 @@ void main() {
 		else if(draw_sand)
 			v3_color =  texture(tex_sand, uv).rgb;
 		else
-			discard;//v3_color = vec3(0,0,0);
+			discard; //if running the reflection, i don t want to see the sand
     }
 
     //Compute diffuse shading.
@@ -109,8 +109,5 @@ void main() {
 	//else
 	    //v3_color = vec3(0,0,0);
 
-	//if(!draw_sand && height<water_limit)
-	    //color = vec4(v3_color, 0.0f); //alpha 0.0
-	//else
-		color = vec4(v3_color, 1.0f); //alpha 1.0
+	color = vec4(v3_color, 1.0f); //alpha 1.0
 }

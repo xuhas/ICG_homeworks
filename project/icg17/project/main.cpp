@@ -29,6 +29,8 @@ Trackball trackball;
 
 int window_width = 800;
 int window_height = 600;
+bool pause = false;
+float stop_time = 0;
 
 using namespace glm;
 
@@ -38,6 +40,7 @@ mat4 trackball_matrix;
 mat4 old_trackball_matrix;
 mat4 model_matrix;
 vec3 cam_pos;
+vec3 view_pos;
 
 #include "glm/ext.hpp"
 
@@ -119,17 +122,12 @@ void Init() {
     // once you use the trackball, you should use a view matrix that
     // looks straight down the -z axis. Otherwise the trackball's rotation gets
     // applied in a rotated coordinate frame.
-    // For this reason we apply all the transformations to the model matrix (otherwise we couldn't be able anymore to use the trackball)
     cam_pos = vec3(0.0f, 0.0f, 1.0f);
-    view_matrix = LookAt(cam_pos,
-                         vec3(0.0f, 0.0f, 0.0f),
-                         vec3(0.0f, 1.0f, 0.0f));
-
-    //view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, 0.0f)); //use the z axis translation if u want to zoom in/out
+    view_pos = vec3(0.0f, 0.0f, 0.0f);
 
     trackball_matrix = IDENTITY_MATRIX;
+    model_matrix = IDENTITY_MATRIX;
 
-    model_matrix = scale(mat4(1.0f),vec3(1,1,1));
     //infinite terrain view: uncomment these lines
     //model_matrix = rotate(model_matrix, -2.3f, vec3(0.0f, 0.0f, 1.0f) /*rot_axe*/); //now the terrain comes against the camera
     //model_matrix = rotate(model_matrix, 0.7f, vec3(1.0f, -1.0f, 0.0f) /*rot_axe*/); //now the terrain is inclinated
@@ -154,28 +152,19 @@ void Display() {
     //calculate the FPS
     float time = (float)glfwGetTime();
     calculate_fps(time);
-
+    if (pause)
+        time = stop_time;
     //if we write every frame the view_matrix, we lose the zoom feature
-    //view_matrix = lookAt(cam_pos, vec3(0.0f,0.0f,0.0f), vec3(0.0f,1.0f,0.0f));
+    view_matrix = lookAt(cam_pos, view_pos, vec3(0.0f,1.0f,0.0f));
 
     //a matrix to do the reflection
-    //mat4 ref = mat4(0);
-    //ref[0][0]=-1; ref[1][1]=1; ref[2][2]=1; ref[3][3]=1;
-
     mat4 ref = mat4(1);
     ref[2][2]=-3;
 
-    // mirror the camera position
-    vec3 mirror_cam_pos(cam_pos.x, cam_pos.y, -cam_pos.z);
     // create new VP for mirrored camera
-    mat4 mirror_V_matrix = lookAt(mirror_cam_pos, vec3(0.0f,0.0f,0.0f), vec3(0.0f,-1.0f,0.0f));
+    mat4 mirror_V_matrix = view_matrix * ref;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // when we will implement the camera movement, we will need to compute in every frame
-    // the camera position.... by now cam_pos is always the same (it is the model that is moving)
-    //vec3 cam_pos_water_ref = vec3(cam_pos.x, cam_pos.y, -cam_pos.z);
-    //mat4 view_mat_refl = lookAt(cam_pos_water_ref, vec3(0,0,0), vec3(0,-1,0));
 
     noise_framebuffer.Bind();
     {
@@ -188,17 +177,15 @@ void Display() {
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        skybox.Draw(trackball_matrix * model_matrix, mirror_V_matrix, projection_matrix);
-        grid.Draw(time, trackball_matrix * model_matrix, mirror_V_matrix, projection_matrix, NOT_DRAW_SAND);
-        //water.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
-
+        skybox.Draw(model_matrix, trackball_matrix * mirror_V_matrix, projection_matrix);
+        grid.Draw(time, model_matrix, trackball_matrix * mirror_V_matrix, projection_matrix, NOT_DRAW_SAND);
     }
     water_refl.Unbind();
 
     //draw before solid objects, then transparent objects to achive the blending of the colours
-    grid.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
-    water.Draw(time, trackball_matrix * model_matrix, view_matrix, projection_matrix);
-    skybox.Draw(trackball_matrix * model_matrix, view_matrix, projection_matrix);
+    grid.Draw(time, model_matrix, trackball_matrix * view_matrix, projection_matrix);
+    water.Draw(time, model_matrix, trackball_matrix * view_matrix, projection_matrix);
+    skybox.Draw(model_matrix, trackball_matrix * view_matrix, projection_matrix);
 
 }
 
@@ -248,7 +235,7 @@ void MousePos(GLFWwindow* window, double x, double y) {
         // 'view_matrix' with a translation along the z axis.
         float var;
         var = p.y - last_y;
-        view_matrix = translate(view_matrix, vec3(0.0f, 0.0f, var * ZOOM_SENSITIVITY));
+        trackball_matrix = translate(trackball_matrix, vec3(0.0f, 0.0f, var * ZOOM_SENSITIVITY));
     }
     last_y = p.y;
 }
@@ -278,33 +265,32 @@ void ErrorCallback(int error, const char* description) {
 }
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    static float total_x = 0; //track the total movement along the axis using keyboard
-    static float total_y = 0;
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
 
-    if (key == GLFW_KEY_X && action == GLFW_PRESS) { //move along X axe INCREASE
-        model_matrix = translate(model_matrix,vec3(0.1f, 0.0f, 0.0f));
-        total_x += 0.1f;
-    }
-    if (key == GLFW_KEY_C && action == GLFW_PRESS) { //move along X axe DECREASE
-        model_matrix = translate(model_matrix,vec3(-0.1f, 0.0f, 0.0f));
-        total_x -= 0.1f;
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) { //enable/disable stop time
+        pause = !pause;
+        stop_time = (float)glfwGetTime();
+
     }
 
-    if (key == GLFW_KEY_Y && action == GLFW_PRESS) { //move along Y axe
-        model_matrix = translate(model_matrix,vec3(0.0f, 0.1f, 0.0f)); //INCREASE
-        total_y += 0.1f;
-    }
-    if (key == GLFW_KEY_U && action == GLFW_PRESS) { //move along Y axe
-        model_matrix = translate(model_matrix,vec3(0.0f, -0.1f, 0.0f)); //DECREASE
-        total_y -= 0.1f;
-    }
+    //MODEL matrix movements
+    {
+        if (key == GLFW_KEY_A && action == GLFW_PRESS) { //MODEL X axe INCREASE - LEFT
+            model_matrix = translate(model_matrix,vec3(0.1f, 0.0f, 0.0f));
+        }
+        if (key == GLFW_KEY_D && action == GLFW_PRESS) { //MODEL X axe DECREASE - RIGHT
+            model_matrix = translate(model_matrix,vec3(-0.1f, 0.0f, 0.0f));
+        }
 
-    //cout << "total x: " << total_x << endl;
-    //cout << "total y: " << total_y << endl;
-
+        if (key == GLFW_KEY_S && action == GLFW_PRESS) { //MODEL Y axe INCREASE - BACK
+            model_matrix = translate(model_matrix,vec3(0.0f, 0.1f, 0.0f));
+        }
+        if (key == GLFW_KEY_W && action == GLFW_PRESS) { //MODEL Y axe DECREASE - FORWARD
+            model_matrix = translate(model_matrix,vec3(0.0f, -0.1f, 0.0f));
+        }
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -371,7 +357,6 @@ int main(int argc, char *argv[]) {
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
 
     noise.Cleanup();
     skybox.Cleanup();
