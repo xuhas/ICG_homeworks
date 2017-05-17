@@ -73,9 +73,7 @@ mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     vec4 C3(0.0f);
 
     C0[0] = 2 * near / (right - left);
-
     C1[1] = 2 * near / (top - bottom);
-
     C2[0] = (right + left) / (right - left);
     C2[1] = (top + bottom) / (top - bottom);
     C2[2] = -(far + near) / (far - near);
@@ -132,6 +130,7 @@ void Init() {
     trackball_matrix = IDENTITY_MATRIX;
 
     model_matrix = scale(mat4(1.0f),vec3(1,1,1));
+    //infinite terrain view: uncomment these lines
     //model_matrix = rotate(model_matrix, -2.3f, vec3(0.0f, 0.0f, 1.0f) /*rot_axe*/); //now the terrain comes against the camera
     //model_matrix = rotate(model_matrix, 0.7f, vec3(1.0f, -1.0f, 0.0f) /*rot_axe*/); //now the terrain is inclinated
     //model_matrix = translate(model_matrix,vec3(-0.1f, -0.1f, 0.0f));
@@ -156,16 +155,20 @@ void Display() {
     float time = (float)glfwGetTime();
     calculate_fps(time);
 
-    view_matrix = lookAt(cam_pos, vec3(0.0f,0.0f,0.0f), vec3(0.0f,1.0f,0.0f));
+    //if we write every frame the view_matrix, we lose the zoom feature
+    //view_matrix = lookAt(cam_pos, vec3(0.0f,0.0f,0.0f), vec3(0.0f,1.0f,0.0f));
 
     //a matrix to do the reflection
-    mat4 ref = mat4(0);
-    ref[0][0]=-1; ref[1][1]=1; ref[2][2]=1; ref[3][3]=1;
+    //mat4 ref = mat4(0);
+    //ref[0][0]=-1; ref[1][1]=1; ref[2][2]=1; ref[3][3]=1;
+
+    mat4 ref = mat4(1);
+    ref[2][2]=-3;
 
     // mirror the camera position
     vec3 mirror_cam_pos(cam_pos.x, cam_pos.y, -cam_pos.z);
     // create new VP for mirrored camera
-    mat4 mirror_V_matrix = lookAt(mirror_cam_pos, vec3(0.0f,0.0f,0.0f), vec3(0.0f,1.0f,0.0f)) * ref;
+    mat4 mirror_V_matrix = lookAt(mirror_cam_pos, vec3(0.0f,0.0f,0.0f), vec3(0.0f,-1.0f,0.0f));
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

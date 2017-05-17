@@ -44,7 +44,7 @@ float fbm(vec2 x) {
 }
 
 void main(){
-    vec2 position = (uv + vec2(1.0, 1.0)) * 5;
-    float height = fbm(position/5-time*SPEED)-0.25;
+	vec2 position = (uv + vec2(1.0, 1.0));
+	float height = fbm(position-time*SPEED)-0.25;
     color = vec3(height, 0.0f, 0.0f);
 }

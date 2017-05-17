@@ -21,7 +21,7 @@ void main() {
 
 	height = texture(tex, uv).x;
 
-	uv = uv * 2 - time * SPEED; //TODO TRY TO REMOVE THE *2
+	uv = uv * 2 - time * SPEED;
 
 	vec3 pos_3d = vec3(position.x, position.y, height);
 

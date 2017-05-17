@@ -14,7 +14,8 @@ uniform vec3 LIGHT_POS; //param.h
 uniform float time;
 
 void main() {
-	uv = (position + vec2(1.0, 1.0)) - time * SPEED * 0.5;
+	uv = (position + vec2(1.0, 1.0)) - time * SPEED * 0.5; //0.5 is to have different speed between the water and the terrain
+	                                                       //(simulate waves)
 
 	//vec3 pos_3d = vec3(position.x, 0 + water_ampl * sin(time), position.y);
 	vec3 pos_3d = vec3(position.x, position.y, WATER_HEIGHT);

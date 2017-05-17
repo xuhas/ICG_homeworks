@@ -25,8 +25,6 @@ float Ld = 0.2; //TODO add in param.h
 float Ls = 0.0; //TODO add in param.h
 float La = 0.2; //TODO add in param.h
 
-//vec3 kd = vec3(0.3,0.3,0.3); //TODO add in param.h
-
 void main() {
     vec3 col_low = vec3(0, 0.45, 0); //green
     vec3 col_high = vec3(0.3, 0.2, 0);//(102/256, 51/256, 0);
@@ -86,7 +84,7 @@ void main() {
 		else if(draw_sand)
 			v3_color =  texture(tex_sand, uv).rgb;
 		else
-			v3_color = vec3(0,0,0);
+			discard;//v3_color = vec3(0,0,0);
     }
 
     //Compute diffuse shading.
@@ -111,8 +109,8 @@ void main() {
 	//else
 	    //v3_color = vec3(0,0,0);
 
-	if(!draw_sand && height<water_limit)
-		color = vec4(v3_color, 0.0f); //alpha 0.0
-	else
+	//if(!draw_sand && height<water_limit)
+	    //color = vec4(v3_color, 0.0f); //alpha 0.0
+	//else
 		color = vec4(v3_color, 1.0f); //alpha 1.0
 }
