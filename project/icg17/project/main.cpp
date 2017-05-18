@@ -253,7 +253,7 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
     //Use a perspective projection instead;
     projection_matrix = PerspectiveProjection(45.0f,
                                               (GLfloat)window_width / window_height,
-                                              0.1f, 100.0f);
+                                              0.0001f, 100.0f);
     noise_framebuffer.Cleanup();
     water_refl.Cleanup();
     noise_framebuffer.Init(window_width, window_height, LINEAR_INTERP);

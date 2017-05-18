@@ -20,7 +20,7 @@ void main() {
 
 	height = texture(tex, uv).x;
 
-	uv = uv * 3 - time * SPEED; //this make the texture repeat 3 times per side of the grid
+        uv = uv * 3.5 - time * SPEED; //this make the texture repeat 3 times per side of the grid
 	                            //then there will be 9 textures quads in the grid
 	                            //this line must be the same on noise_fshader
 	vec3 pos_3d = vec3(position.x, position.y, height);

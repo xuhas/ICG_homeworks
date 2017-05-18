@@ -75,7 +75,7 @@ public:
         glBindVertexArray(vertex_array_id_);
 
         // Position buffer
-        const GLfloat position[] = {-1.0f, -1.0f,  1.0f, // left, bottom, front
+        GLfloat position[] = {-1.0f, -1.0f,  1.0f, // left, bottom, front
                                     1.0f, -1.0f,  1.0f,  // right, bottom, front
                                     1.0f,  1.0f,  1.0f,  // right, top, front
                                     -1.0f,  1.0f,  1.0f, // left, top, front
@@ -83,6 +83,9 @@ public:
                                     1.0f, -1.0f, -1.0f,  // right, bottom, back
                                     1.0f,  1.0f, -1.0f,  // right, top, back
                                     -1.0f,  1.0f, -1.0f};// left, top, back
+        for(int i=0;i<24;i++){
+            position[i]=position[i]*3.0f;
+        }
 
         glGenBuffers(1, &vertex_buffer_object_position_);
         glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_position_);

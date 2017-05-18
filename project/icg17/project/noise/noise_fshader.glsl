@@ -58,7 +58,7 @@ void main(){
 	//float height = fbm(position/5-time*SPEED)/3 -0.15;
 
 	//the arg of fbm must be the same on grid_vshader (only the arg)
-	float height = fbm(uv*3-time*SPEED)/2.5 -0.15;
+        float height = fbm(uv*3.5-time*SPEED)/2.5 -0.06;
 
     color = vec3(height, 0.0f, 0.0f);
 }

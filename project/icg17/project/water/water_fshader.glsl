@@ -13,8 +13,8 @@ uniform float time;
 
 void main() {
 	//TODO add in param.h all the shading coeff
-	float Ld = 0.3;
-	float Ls = 1;
+        float Ld = 0.3;
+        float Ls = 0.1;
 
 	//TEXTURE
 	{

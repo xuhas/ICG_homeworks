@@ -22,7 +22,7 @@ out vec4 color;
 
 vec3 v3_color; //temporary variable, to add alpha at the end
 float Ld = 0.2; //TODO add in param.h
-float Ls = 0.0; //TODO add in param.h
+float Ls = 1.0f; //TODO add in param.h
 float La = 0.2; //TODO add in param.h
 
 void main() {
