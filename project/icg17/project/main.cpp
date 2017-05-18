@@ -17,7 +17,7 @@
 
 #define WATER_REFLECTION 1
 #define NOT_DRAW_SAND false
-
+#define LINEAR_INTERP true
 
 Grid grid;
 Noise noise;
@@ -111,8 +111,8 @@ void Init() {
 
     skybox.Init();
     noise.Init();
-    GLuint framebuffer_noise_id = noise_framebuffer.Init(window_width, window_height,true);
-    GLuint framebuffer_water_refl_id = water_refl.Init(window_width,window_height,false, WATER_REFLECTION);
+    GLuint framebuffer_noise_id = noise_framebuffer.Init(window_width, window_height,LINEAR_INTERP);
+    GLuint framebuffer_water_refl_id = water_refl.Init(window_width,window_height,LINEAR_INTERP, WATER_REFLECTION);
     grid.Init(framebuffer_noise_id);
     water.Init(framebuffer_water_refl_id);
 
@@ -256,8 +256,9 @@ void SetupProjection(GLFWwindow* window, int width, int height) {
                                               0.1f, 100.0f);
     noise_framebuffer.Cleanup();
     water_refl.Cleanup();
-    water_refl.Init(window_width, window_height);
-    noise_framebuffer.Init(window_width, window_height);
+    noise_framebuffer.Init(window_width, window_height, LINEAR_INTERP);
+    water_refl.Init(window_width, window_height, LINEAR_INTERP, WATER_REFLECTION );
+    glClearColor(0.9, 0.9, 1.0 /*gray*/, 0.5 /*solid*/);
 }
 
 void ErrorCallback(int error, const char* description) {

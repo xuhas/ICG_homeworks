@@ -24,7 +24,7 @@ class FrameBuffer {
             //glViewport(0, 0, 800, 600);
         }
 
-        int Init(int image_width, int image_height, bool use_interpolation = false, int water_refl = 0) {
+        int Init(int image_width, int image_height, bool use_interpolation = false, bool water_refl = false) {
             this->width_ = image_width;
             this->height_ = image_height;
 
@@ -86,7 +86,7 @@ class FrameBuffer {
             glDeleteRenderbuffers(1, &depth_render_buffer_id_);
             glBindFramebuffer(GL_FRAMEBUFFER, 0 /*UNBIND*/);
 			glDrawBuffer(GL_COLOR_ATTACHMENT0);
-			glClearColor(1.0, 1.0, 1.0, 1.0);
+            glClearColor(1.0, 1.0, 1.0, 1.0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glDrawBuffer(GL_COLOR_ATTACHMENT1);
 			glClearColor(0.0, 0.0, 0.0, 1.0);
