@@ -33,7 +33,7 @@ void main() {
 	float snow_limit = SNOW_HEIGHT;
 	float rock_limit = ROCK_HEIGHT;
 
-	if (USE_COLOURS == true){
+	if (USE_COLOURS){
         if(height <= water_limit) //water
 			v3_color = vec3(0.0,0.0,1.0); //blue
         else if((height > rock_limit) && (height < snow_limit)) //rocks
@@ -64,8 +64,8 @@ void main() {
     }
     else{
         if(height > snow_limit){ //snow
-            if (height < snow_limit + 0.1){ //blend snow and rocks
-                float height_coeff = (height - snow_limit) / 0.1; //mapped from 0 to 1
+			if (height < snow_limit + 0.05){ //blend snow and rocks
+				float height_coeff = (height - snow_limit) / 0.05; //mapped from 0 to 1
 				v3_color = texture(tex_snow, uv).rgb * height_coeff + texture(tex_rock, uv).rgb * (1.0 - height_coeff);
             }
             else

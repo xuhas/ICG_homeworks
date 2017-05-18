@@ -8,7 +8,7 @@ noise is deterministic but since there is a time variable, it can vary every run
 We can switch from perlin noise and fractal Brownian noise by changind the
 function in the main. We may implement changing by key later on*/
 
-in vec2 uv;
+in vec2 position;
 
 out vec3 color;
 
@@ -16,10 +16,9 @@ uniform mat4 MVP;
 uniform float time;
 uniform float SPEED; //param.h
 
-vec2 position;
-
 //fractional brownian octaves
-int NUM_OCTAVES=100;
+int NUM_OCTAVES=10; //before it was 100, but it is very heavy!
+                    //it seems that doesn t change anything actually
 
 //A rand function
 float rand(vec2 n) {
@@ -53,17 +52,14 @@ float fbm(vec2 x) {
     return v;
 }
 
-
-
-
-
 void main(){
+	vec2 uv = (position + vec2(1.0, 1.0)) * 0.5; //now uv goes from 0.0 to 1.0
 
-    vec2 position = (uv + vec2(1.0, 1.0)) * 5;
-    vec2 norm_pos = normalize(uv) ;
-//    float height = fbm(position/5-time*SPEED)/3 -0.15;
-    float height = fbm(uv*1.5-time*SPEED)/2.5 -0.15;
-    
+	//float height = fbm(position/5-time*SPEED)/3 -0.15;
+
+	//the arg of fbm must be the same on grid_vshader (only the arg)
+	float height = fbm(uv*3-time*SPEED)/2.5 -0.15;
+
     color = vec3(height, 0.0f, 0.0f);
 }
 
