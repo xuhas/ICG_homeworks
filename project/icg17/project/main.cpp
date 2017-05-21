@@ -215,19 +215,20 @@ void Display(GLFWwindow* window) {
     if(cam_mode==DEFAULT){
         view_matrix = lookAt(cam_pos, view_pos, vec3(-1.0f,0.0f,-1.0f));
     }
-    if(cam_mode==FIRST_PERSON_SHOOTER){
+    //fly_trough should be very similar or included here
+    if(cam_mode==FIRST_PERSON_SHOOTER||cam_mode==FLY_THROUGH){
 
         float mouseSpeed = 0.005f;
-        float deltaTime = 1;
         double x_i, y_i;
         glfwGetCursorPos(window, &x_i, &y_i);
+        //cout<<"x:"<<x_i<<" y_i "<<y_i<<endl;
         //Reset mouse poistion for nect frame
-        double rposx=window_width/2;
+        double rposx = window_width/2;
         double rposy = window_height/2;
         glfwSetCursorPos(window,rposx, rposy);
         //compute horizontal and vertical angles
-         horizontalAngle += mouseSpeed * deltaTime * float(rposx - x_i);
-         verticalAngle   += mouseSpeed * deltaTime * float(rposy - y_i);
+         horizontalAngle += mouseSpeed  * float(rposx - x_i);
+         verticalAngle   += mouseSpeed  * float(rposy - y_i);
         //a vector from spherical coords to cartesian
         vec3 direction(cos(horizontalAngle),
                        sin(horizontalAngle),
@@ -389,11 +390,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             }
             if (key == GLFW_KEY_W) { //MODEL Y axe DECREASE - FORWARD
                 model_matrix = translate(model_matrix ,PACE*glm::normalize(-view_pos));
-            }
+            }       
         break;
 
         case FLY_THROUGH:
             /*kind of god-mode*/
+            cam_mode=FIRST_PERSON_SHOOTER;//I know, im lazy
         break;
 
         case INFINITE_TERRAIN:
