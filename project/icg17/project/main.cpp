@@ -18,7 +18,8 @@
 #include "water/water.h"
 #include "param.h"
 #include "glm/ext.hpp"
-//some defines--maybe should be in param.h
+
+//defines for clearer use of functions in main.cpp
 #define WATER_REFLECTION 1
 #define NOT_DRAW_SAND false
 #define LINEAR_INTERP true
@@ -29,7 +30,7 @@ Skybox skybox;
 FrameBuffer noise_framebuffer;
 FrameBuffer water_refl;
 Water water;
-Trackball trackball;//should maybe be created later
+Trackball trackball;
 
 //initial window dimensions
 int window_width = 800;
@@ -47,9 +48,9 @@ mat4 trackball_matrix;
 mat4 old_trackball_matrix;
 mat4 model_matrix;
 vec3 cam_pos;
+vec2 cam_speed;
 vec3 view_pos;
-float horizontalAngle ;
-float verticalAngle ;
+vec3 view_dir;
 
 // camera modes
 enum CameraMode { DEFAULT, FIRST_PERSON_SHOOTER, FLY_THROUGH, BEZIER, INFINITE_TERRAIN};
@@ -108,6 +109,7 @@ mat4 PerspectiveProjection(float fovy, float aspect, float near, float far) {
     mat4 projection(C0, C1, C2, C3);
     return projection;
 }
+
 //Look at matrix defines the direction of the view
 mat4 LookAt(vec3 eye, vec3 center, vec3 up) {
     vec3 z_cam = normalize(eye - center);
@@ -143,27 +145,23 @@ void Init() {
     // looks straight down the -z axis. Otherwise the trackball's rotation gets
     // applied in a rotated coordinate frame.
     cam_pos = vec3(0.0f, 0.0f, 1.0f);
+    cam_speed = vec2(0.0f, 0.0f);
     view_pos = vec3(0.0f, 0.0f, 0.0f);
     model_matrix = IDENTITY_MATRIX;
-    if(cam_mode==DEFAULT){
+    if(cam_mode == DEFAULT){
         trackball_matrix = IDENTITY_MATRIX;
     }
-
-    //infinite terrain view: uncomment these lines
-    //model_matrix = rotate(model_matrix, -2.3f, vec3(0.0f, 0.0f, 1.0f) /*rot_axe*/); //now the terrain comes against the camera
-    //model_matrix = rotate(model_matrix, 0.7f, vec3(1.0f, -1.0f, 0.0f) /*rot_axe*/); //now the terrain is inclinated
-    //model_matrix = translate(model_matrix,vec3(-0.1f, -0.1f, 0.0f));
 }
 
-// transforms glfw screen coordinates into normalized OpenGL coordinates.
+// transforms glfw screen coordinates into normalized OpenGL coordinates in [-1,1], the center of the screen is (0,0).
 vec2 TransformScreenCoords(GLFWwindow* window, int x, int y) {
     // the framebuffer and the window doesn't necessarily have the same size
     // i.e. hidpi screens. so we need to get the correct one
     int width;
     int height;
     glfwGetWindowSize(window, &width, &height);
-    return vec2(2.0f * (float)x / width - 1.0f,
-                1.0f - 2.0f * (float)y / height);
+    return vec2(2.0f * (float)x / width - 1.0f, //x=0 becomes x=-1
+                1.0f - 2.0f * (float)y / height); //y=0 becomes y=1
 }
 
 //returns the click of the mouse in screen coordinates
@@ -211,39 +209,24 @@ void Display(GLFWwindow* window) {
     calculate_fps(time);
     if (pause)
         time = stop_time;
-    //if we write every frame the view_matrix, we lose the zoom feature
-    if(cam_mode==DEFAULT){
+    if(cam_mode == DEFAULT){
         view_matrix = lookAt(cam_pos, view_pos, vec3(-1.0f,0.0f,-1.0f));
     }
-    if(cam_mode==FIRST_PERSON_SHOOTER){
-
-        float mouseSpeed = 0.005f;
-        float deltaTime = 1;
+    if(cam_mode == FLY_THROUGH){
         double x_i, y_i;
         glfwGetCursorPos(window, &x_i, &y_i);
-        //Reset mouse poistion for nect frame
-        double rposx=window_width/2;
-        double rposy = window_height/2;
-        glfwSetCursorPos(window,rposx, rposy);
         //compute horizontal and vertical angles
-         horizontalAngle += mouseSpeed * deltaTime * float(rposx - x_i);
-         verticalAngle   += mouseSpeed * deltaTime * float(rposy - y_i);
+        float horizontalAngle = MOUSE_SENSITITY * float(-x_i);
+        float verticalAngle = MOUSE_SENSITITY * float(-y_i);
         //a vector from spherical coords to cartesian
-        vec3 direction(cos(horizontalAngle),
-                       sin(horizontalAngle),
-                       verticalAngle);
-        //right vector
-//        vec3 right  = vec3(sin(horizontalAngle - 3.14f/2.0f),
-//                           0,
-//                           cos(horizontalAngle - 3.14f/2.01f));
-        //up vecor
-//         vec3 up = cross(right, direction);
-
-
-        cam_pos = vec3(0.0f, 0.0f, 0.5f);
-        view_pos = direction;
+        view_dir = vec3(cos(horizontalAngle),
+                        sin(horizontalAngle),
+                        verticalAngle);
+        cam_pos += glm::normalize(view_dir) * cam_speed.x;
+        cam_pos += glm::cross(view_dir,vec3(0.0,0.0,1.0)) * cam_speed.y;
+        view_pos = cam_pos + view_dir;
         view_matrix = lookAt(cam_pos, view_pos, vec3(0.0,0.0,1.0));
-
+        cam_speed = cam_speed * INERTIA;
     }
 
 
@@ -312,99 +295,97 @@ void ErrorCallback(int error, const char* description) {
 }
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods){
-
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    }
-
-    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) { //enable/disable stop
-        pause = !pause;
-        stop_time = (float)glfwGetTime();
-    }
-
-    //switch case to chose the between the different camera modes
     switch(key){
+        case GLFW_KEY_ESCAPE :
+            glfwSetWindowShouldClose(window, GL_TRUE);
+            break;
+        case GLFW_KEY_SPACE :
+            pause = !pause;
+            stop_time = (float)glfwGetTime();
+            break;
+        //camera mods
         case '1' :
             cam_mode = DEFAULT;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             break;
         case '2' :
             cam_mode = BEZIER;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             break;
         case '3' :
             cam_mode = FIRST_PERSON_SHOOTER;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //cursor disabled
             break;
         case '4' :
             cam_mode = FLY_THROUGH;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //cursor disabled
             break;
         case '5' :
             cam_mode = INFINITE_TERRAIN;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             break;
     }
 
     //switch case for the different camera modes.
     switch(cam_mode){
-
         case DEFAULT:
-         /* What we had(trackball n' everything)*/
-
+            /* What we had(trackball n' everything)*/
             //MODEL matrix movements
-            {
-                if (key == GLFW_KEY_A && action == GLFW_PRESS) { //MODEL X axe INCREASE - LEFT
-                    model_matrix = translate(model_matrix,vec3(0.1f, 0.0f, 0.0f));
-                }
-
-                if (key == GLFW_KEY_D && action == GLFW_PRESS) { //MODEL X axe DECREASE - RIGHT
-                    model_matrix = translate(model_matrix,vec3(-0.1f, 0.0f, 0.0f));
-                }
-
-                if (key == GLFW_KEY_S && action == GLFW_PRESS) { //MODEL Y axe INCREASE - BACK
-                    model_matrix = translate(model_matrix,vec3(0.0f, 0.1f, 0.0f));
-                }
-
-                if (key == GLFW_KEY_W && action == GLFW_PRESS) { //MODEL Y axe DECREASE - FORWARD
-                    model_matrix = translate(model_matrix,vec3(0.0f, -0.1f, 0.0f));
-                }
+        {
+            if (key == GLFW_KEY_A && action == GLFW_PRESS) { //MODEL X axe INCREASE - LEFT
+                model_matrix = translate(model_matrix,vec3(0.1f, 0.0f, 0.0f));
             }
-        break;
 
+            if (key == GLFW_KEY_D && action == GLFW_PRESS) { //MODEL X axe DECREASE - RIGHT
+                model_matrix = translate(model_matrix,vec3(-0.1f, 0.0f, 0.0f));
+            }
+
+            if (key == GLFW_KEY_S && action == GLFW_PRESS) { //MODEL Y axe INCREASE - BACK
+                model_matrix = translate(model_matrix,vec3(0.0f, 0.1f, 0.0f));
+            }
+
+            if (key == GLFW_KEY_W && action == GLFW_PRESS) { //MODEL Y axe DECREASE - FORWARD
+                model_matrix = translate(model_matrix,vec3(0.0f, -0.1f, 0.0f));
+            }
+        }
+            break;
 
         case BEZIER:
             /*Bezier curves*/
-        break;
+            break;
+
+        case FLY_THROUGH:
+            /*kind of god-mode*/
+            if (key == GLFW_KEY_W ) {
+                cam_speed.x += PACE;
+            }
+            if (key == GLFW_KEY_S) {
+                cam_speed.x -= PACE;
+            }
+
+            if (key == GLFW_KEY_A) {
+                 cam_speed.y -= PACE;
+            }
+            if (key == GLFW_KEY_D) {
+                 cam_speed.y += PACE;
+            }
+            break;
 
         case FIRST_PERSON_SHOOTER:
             /* Camera is pinned to the ground, camera can move
              * around with WASD keys and the the mouse orientes
              * the camera*/
-
-            if (key == GLFW_KEY_A) { //MODEL X axe INCREASE - LEFT
-                model_matrix = translate(model_matrix , PACE*glm::cross(glm::normalize(view_pos), vec3(0.0,0.0,1.0)));
-            }
-            if (key == GLFW_KEY_D) { //MODEL X axe DECREASE - RIGHT
-                model_matrix = translate(model_matrix ,PACE* glm::cross(glm::normalize(view_pos), vec3(0.0,0.0,-1.0)));
-            }
-
-            if (key == GLFW_KEY_S) { //MODEL Y axe INCREASE - BACK
-                model_matrix = translate(model_matrix , PACE*glm::normalize(view_pos));
-            }
-            if (key == GLFW_KEY_W) { //MODEL Y axe DECREASE - FORWARD
-                model_matrix = translate(model_matrix ,PACE*glm::normalize(-view_pos));
-            }
-        break;
-
-        case FLY_THROUGH:
-            /*kind of god-mode*/
-        break;
+            break;
 
         case INFINITE_TERRAIN:
             /* Camera is static, the noise moves. The camera
              * will never be near the edge of the terrain so
              * it will give the look on infinite terrain*/
-        break;
+            break;
 
     }
 }
-    int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     // GLFW Initialization
     if(!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");
