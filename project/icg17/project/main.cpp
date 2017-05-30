@@ -30,7 +30,6 @@ Skybox skybox;
 FrameBuffer noise_framebuffer;
 FrameBuffer water_refl;
 Water water;
-Trackball trackball;
 
 //initial window dimensions
 int window_width = 800;
@@ -44,17 +43,15 @@ using namespace glm;
 //matrixes for the view
 mat4 projection_matrix;
 mat4 view_matrix;
-mat4 trackball_matrix;
-mat4 old_trackball_matrix;
 mat4 model_matrix;
 vec3 cam_pos;
-vec2 cam_speed;
+vec2 cam_speed; //on the x the FW-BW speed, on the y the LX-RX speed
 vec3 view_pos;
 vec3 view_dir;
 
 // camera modes
 enum CameraMode { DEFAULT, FIRST_PERSON_SHOOTER, FLY_THROUGH, BEZIER, INFINITE_TERRAIN};
-CameraMode cam_mode = DEFAULT;//creation of a camera mode, starts with default
+CameraMode cam_mode = FLY_THROUGH;//creation of a camera mode, starts with default
 
 //calculation of the fps during the animation
 //prints every second the FPS
@@ -141,16 +138,10 @@ void Init() {
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
 
-    // once you use the trackball, you should use a view matrix that
-    // looks straight down the -z axis. Otherwise the trackball's rotation gets
-    // applied in a rotated coordinate frame.
     cam_pos = vec3(0.0f, 0.0f, 1.0f);
     cam_speed = vec2(0.0f, 0.0f);
     view_pos = vec3(0.0f, 0.0f, 0.0f);
     model_matrix = IDENTITY_MATRIX;
-    if(cam_mode == DEFAULT){
-        trackball_matrix = IDENTITY_MATRIX;
-    }
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates in [-1,1], the center of the screen is (0,0).
@@ -167,40 +158,14 @@ vec2 TransformScreenCoords(GLFWwindow* window, int x, int y) {
 //returns the click of the mouse in screen coordinates
 void MouseButton(GLFWwindow* window, int button, int action, int mod) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        double x_i, y_i;
-        glfwGetCursorPos(window, &x_i, &y_i);
-        vec2 p = TransformScreenCoords(window, x_i, y_i);
-        trackball.BeingDrag(p.x, p.y);
-        old_trackball_matrix = trackball_matrix;
-        // Store the current state of the model matrix.
 
     }
 }
 
 //gives the position of the mouse in screen coordinates
 void MousePos(GLFWwindow* window, double x, double y) {
-    static float last_y = 0;
-    vec2 p = TransformScreenCoords(window, x, y);
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        // Calculate 'trackball_matrix' given the return value of
-        // trackball.Drag(...) and the value stored in 'old_trackball_matrix'.
-        // See also the mouse_button(...) function.
-        trackball_matrix =  trackball.Drag(p.x, p.y) * old_trackball_matrix;
-    }
 
-    // zoom
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        // Implement zooming. When the right mouse button is pressed,
-        // moving the mouse cursor up and down (along the screen's y axis)
-        // should zoom out and it. For that you have to update the current
-        // 'view_matrix' with a translation along the z axis.
-        float var;
-        var = p.y - last_y;
-        trackball_matrix = translate(trackball_matrix, vec3(0.0f, 0.0f, var * ZOOM_SENSITIVITY));
-    }
-    last_y = p.y;
 }
-
 
 // gets called for every frame.
 void Display(GLFWwindow* window) {
@@ -209,9 +174,7 @@ void Display(GLFWwindow* window) {
     calculate_fps(time);
     if (pause)
         time = stop_time;
-    if(cam_mode == DEFAULT){
-        view_matrix = lookAt(cam_pos, view_pos, vec3(-1.0f,0.0f,-1.0f));
-    }
+
     if(cam_mode == FLY_THROUGH){
         double x_i, y_i;
         glfwGetCursorPos(window, &x_i, &y_i);
@@ -250,7 +213,7 @@ void Display(GLFWwindow* window) {
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if(cam_mode==DEFAULT){
-            mirror_V_matrix= trackball_matrix * mirror_V_matrix;
+            mirror_V_matrix= mirror_V_matrix;
         }
         skybox.Draw(model_matrix, mirror_V_matrix, projection_matrix);
         grid.Draw(time, model_matrix,  mirror_V_matrix, projection_matrix, NOT_DRAW_SAND);
@@ -259,15 +222,13 @@ void Display(GLFWwindow* window) {
 
     //draw before solid objects, then transparent objects to achive the blending of the colours
     if(cam_mode==DEFAULT){
-        view_matrix= trackball_matrix * view_matrix;
+        view_matrix= view_matrix;
     }
     grid.Draw(time, model_matrix, view_matrix, projection_matrix);
     water.Draw(time, model_matrix,  view_matrix, projection_matrix);
     skybox.Draw(model_matrix, view_matrix, projection_matrix);
 
 }
-
-
 
 // Gets called when the windows/framebuffer is resized.
 void SetupProjection(GLFWwindow* window, int width, int height) {
@@ -329,31 +290,17 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     //switch case for the different camera modes.
     switch(cam_mode){
         case DEFAULT:
-            /* What we had(trackball n' everything)*/
-            //MODEL matrix movements
-        {
-            if (key == GLFW_KEY_A && action == GLFW_PRESS) { //MODEL X axe INCREASE - LEFT
-                model_matrix = translate(model_matrix,vec3(0.1f, 0.0f, 0.0f));
-            }
-
-            if (key == GLFW_KEY_D && action == GLFW_PRESS) { //MODEL X axe DECREASE - RIGHT
-                model_matrix = translate(model_matrix,vec3(-0.1f, 0.0f, 0.0f));
-            }
-
-            if (key == GLFW_KEY_S && action == GLFW_PRESS) { //MODEL Y axe INCREASE - BACK
-                model_matrix = translate(model_matrix,vec3(0.0f, 0.1f, 0.0f));
-            }
-
-            if (key == GLFW_KEY_W && action == GLFW_PRESS) { //MODEL Y axe DECREASE - FORWARD
-                model_matrix = translate(model_matrix,vec3(0.0f, -0.1f, 0.0f));
-            }
-        }
             break;
 
         case BEZIER:
             /*Bezier curves*/
             break;
 
+        case FIRST_PERSON_SHOOTER:
+            /* Camera is pinned to the ground, camera can move
+             * around with WASD keys and the the mouse orientes
+             * the camera*/
+            break;
         case FLY_THROUGH:
             /*kind of god-mode*/
             if (key == GLFW_KEY_W ) {
@@ -364,27 +311,22 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             }
 
             if (key == GLFW_KEY_A) {
-                 cam_speed.y -= PACE;
+                cam_speed.y -= PACE;
             }
-            if (key == GLFW_KEY_D) {
-                 cam_speed.y += PACE;
-            }
-            break;
 
-        case FIRST_PERSON_SHOOTER:
-            /* Camera is pinned to the ground, camera can move
-             * around with WASD keys and the the mouse orientes
-             * the camera*/
+            if (key == GLFW_KEY_D) {
+                cam_speed.y += PACE;
+            }
             break;
 
         case INFINITE_TERRAIN:
-            /* Camera is static, the noise moves. The camera
+        /* Camera is static, the noise moves. The camera
              * will never be near the edge of the terrain so
              * it will give the look on infinite terrain*/
             break;
-
     }
 }
+
 int main(int argc, char *argv[]) {
     // GLFW Initialization
     if(!glfwInit()) {
@@ -442,6 +384,9 @@ int main(int argc, char *argv[]) {
 
     // initialize our OpenGL program
     Init();
+
+    if (cam_mode == FLY_THROUGH)
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //cursor disabled
 
     // render loop
     while(!glfwWindowShouldClose(window)){
