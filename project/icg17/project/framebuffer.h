@@ -11,12 +11,16 @@ class FrameBuffer {
         GLuint color_texture_id_;
 
     public:
+
+        glm::vec2 position2D=glm::vec2(0.0f,0.0f);
+        float terrain_height;
         // warning: overrides viewport!!
         void Bind() {
             glViewport(0, 0, width_, height_);
             glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object_id_);
 			const GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
 			glDrawBuffers(2 /*length of buffers[]*/, buffers);
+
         }
 
         void Unbind() {

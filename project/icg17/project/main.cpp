@@ -36,6 +36,7 @@ int window_width = 800;
 int window_height = 600;
 bool pause = false;
 float stop_time = 0;
+float altitude;//for FPS
 
 //for some geomatrical functions
 using namespace glm;
@@ -138,7 +139,7 @@ void Init() {
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
 
-    cam_pos = vec3(0.0f, 0.0f, 1.0f);
+    cam_pos = vec3(0.0f, 0.0f, 0.3f);
     cam_speed = vec2(0.0f, 0.0f);
     view_pos = vec3(0.0f, 0.0f, 0.0f);
     model_matrix = IDENTITY_MATRIX;
@@ -175,7 +176,7 @@ void Display(GLFWwindow* window) {
     if (pause)
         time = stop_time;
 
-    if(cam_mode == FLY_THROUGH){
+    if(cam_mode == FLY_THROUGH||FIRST_PERSON_SHOOTER){
         double x_i, y_i;
         glfwGetCursorPos(window, &x_i, &y_i);
         //compute horizontal and vertical angles
@@ -190,6 +191,7 @@ void Display(GLFWwindow* window) {
         view_pos = cam_pos + view_dir;
         view_matrix = lookAt(cam_pos, view_pos, vec3(0.0,0.0,1.0));
         cam_speed = cam_speed * INERTIA;
+
     }
 
 
@@ -206,8 +208,10 @@ void Display(GLFWwindow* window) {
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         noise.Draw(time, IDENTITY_MATRIX, view_matrix, projection_matrix);
-    }
-    noise_framebuffer.Unbind();
+        glReadPixels(window_width*(cam_pos[0]+1)/2,window_height*(cam_pos[1]+1)/2,1,1,GL_RED , GL_FLOAT ,&altitude);
+        std::cout<<cam_pos[0]<<","<< cam_pos[1]<<","<<cam_pos[2]<<endl;}
+    if(cam_mode == FIRST_PERSON_SHOOTER){cam_pos[2]=altitude+0.01;}
+        noise_framebuffer.Unbind();
 
     water_refl.Bind();
     {
@@ -217,6 +221,7 @@ void Display(GLFWwindow* window) {
         }
         skybox.Draw(model_matrix, mirror_V_matrix, projection_matrix);
         grid.Draw(time, model_matrix,  mirror_V_matrix, projection_matrix, NOT_DRAW_SAND);
+
     }
     water_refl.Unbind();
 
@@ -300,6 +305,24 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             /* Camera is pinned to the ground, camera can move
              * around with WASD keys and the the mouse orientes
              * the camera*/
+            //fps_height= noise_framebuffer.terrain_height;
+
+            std::cout<<altitude<<endl;
+            if (key == GLFW_KEY_W ) {
+                cam_speed.x += 0.3*PACE;
+            }
+            if (key == GLFW_KEY_S) {
+                cam_speed.x -= 0.3*PACE;
+            }
+
+            if (key == GLFW_KEY_A) {
+                cam_speed.y -= 0.3*PACE;
+            }
+
+            if (key == GLFW_KEY_D) {
+                cam_speed.y += 0.3*PACE;
+            }
+
             break;
         case FLY_THROUGH:
             /*kind of god-mode*/
