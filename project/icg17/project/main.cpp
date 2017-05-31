@@ -199,7 +199,9 @@ void Display(GLFWwindow* window) {
         view_matrix = lookAt(cam_pos, view_pos, vec3(0.0,0.0,1.0));
         cam_speed = cam_speed * INERTIA;
 
+
     }
+    if(cam_mode == FIRST_PERSON_SHOOTER||cam_mode == INFINITE_TERRAIN){cam_pos[2]=altitude+0.003;}
 
     if(cam_mode == BEZIER) {
         vec3 position;
@@ -246,9 +248,9 @@ void Display(GLFWwindow* window) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         noise.Draw(time, IDENTITY_MATRIX, view_matrix, projection_matrix);
         glReadPixels(window_width*(cam_pos[0]+1)/2,window_height*(cam_pos[1]+1)/2,1,1,GL_RED , GL_FLOAT ,&altitude);
-        std::cout<<cam_pos[0]<<","<< cam_pos[1]<<","<<cam_pos[2]<<endl;}
-    if(cam_mode == FIRST_PERSON_SHOOTER){cam_pos[2]=altitude+0.01;}
-        noise_framebuffer.Unbind();
+        //std::cout<<cam_pos[0]<<","<< cam_pos[1]<<","<<cam_pos[2]<<endl;
+    }
+    noise_framebuffer.Unbind();
 
     water_refl.Bind();
     {
@@ -299,93 +301,95 @@ void ErrorCallback(int error, const char* description) {
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods){
     switch(key){
-        case GLFW_KEY_ESCAPE :
-            glfwSetWindowShouldClose(window, GL_TRUE);
-            break;
-        case GLFW_KEY_SPACE :
+    case GLFW_KEY_ESCAPE :
+        glfwSetWindowShouldClose(window, GL_TRUE);
+        break;
+    case GLFW_KEY_SPACE :
+        if(action==GLFW_PRESS){
             pause = !pause;
             stop_time = (float)glfwGetTime();
-            break;
+        }
+
+        break;
         //camera mods
-        case '1' :
-            cam_mode = DEFAULT;
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            break;
-        case '2' :
-            cam_mode = BEZIER;
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            b_path_start = true;
-            bezier_time = glfwGetTime();
-            break;
-        case '3' :
-            cam_mode = FIRST_PERSON_SHOOTER;
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //cursor disabled
-            break;
-        case '4' :
-            cam_mode = FLY_THROUGH;
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //cursor disabled
-            break;
-        case '5' :
-            cam_mode = INFINITE_TERRAIN;
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            break;
+    case '1' :
+        cam_mode = DEFAULT;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        break;
+    case '2' :
+        cam_mode = BEZIER;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        b_path_start = true;
+        bezier_time = glfwGetTime();
+        break;
+    case '3' :
+        cam_mode = FIRST_PERSON_SHOOTER;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //cursor disabled
+        break;
+    case '4' :
+        cam_mode = FLY_THROUGH;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //cursor disabled
+        break;
+    case '5' :
+        cam_mode = INFINITE_TERRAIN;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        break;
     }
 
     //switch case for the different camera modes.
     switch(cam_mode){
-        case DEFAULT:
-            break;
+    case DEFAULT:
+        break;
 
-        case BEZIER:
-            /*Bezier curves*/
-            break;
+    case BEZIER:
+        /*Bezier curves*/
+        break;
 
-        case FIRST_PERSON_SHOOTER:
-            /* Camera is pinned to the ground, camera can move
+    case FIRST_PERSON_SHOOTER:
+        /* Camera is pinned to the ground, camera can move
              * around with WASD keys and the the mouse orientes
              * the camera*/
-            //fps_height= noise_framebuffer.terrain_height;
+        //std::cout<<altitude<<endl;
+        if (key == GLFW_KEY_W ) {
+            cam_speed.x += 0.1*PACE;
+        }
+        if (key == GLFW_KEY_S) {
+            cam_speed.x -= 0.1*PACE;
+        }
 
-            std::cout<<altitude<<endl;
-            if (key == GLFW_KEY_W ) {
-                cam_speed.x += 0.3*PACE;
-            }
-            if (key == GLFW_KEY_S) {
-                cam_speed.x -= 0.3*PACE;
-            }
+        if (key == GLFW_KEY_A) {
+            cam_speed.y -= 0.1*PACE;
+        }
 
-            if (key == GLFW_KEY_A) {
-                cam_speed.y -= 0.3*PACE;
-            }
+        if (key == GLFW_KEY_D) {
+            cam_speed.y += 0.1*PACE;
+        }
 
-            if (key == GLFW_KEY_D) {
-                cam_speed.y += 0.3*PACE;
-            }
+        break;
+    case FLY_THROUGH:
+        /*kind of god-mode*/
+        if (key == GLFW_KEY_W ) {
+            cam_speed.x += PACE;
+        }
+        if (key == GLFW_KEY_S) {
+            cam_speed.x -= PACE;
+        }
 
-            break;
-        case FLY_THROUGH:
-            /*kind of god-mode*/
-            if (key == GLFW_KEY_W ) {
-                cam_speed.x += PACE;
-            }
-            if (key == GLFW_KEY_S) {
-                cam_speed.x -= PACE;
-            }
+        if (key == GLFW_KEY_A) {
+            cam_speed.y -= PACE;
+        }
 
-            if (key == GLFW_KEY_A) {
-                cam_speed.y -= PACE;
-            }
+        if (key == GLFW_KEY_D) {
+            cam_speed.y += PACE;
+        }
+        break;
 
-            if (key == GLFW_KEY_D) {
-                cam_speed.y += PACE;
-            }
-            break;
-
-        case INFINITE_TERRAIN:
+    case INFINITE_TERRAIN:
         /* Camera is static, the noise moves. The camera
              * will never be near the edge of the terrain so
              * it will give the look on infinite terrain*/
-            break;
+
+        break;
     }
 }
 

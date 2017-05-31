@@ -21,9 +21,9 @@ uniform bool draw_sand;
 out vec4 color;
 
 vec3 v3_color; //temporary variable, to add alpha at the end
-float Ld = 0.2; //TODO add in param.h
-float Ls = 1.0f; //TODO add in param.h
-float La = 0.2; //TODO add in param.h
+float Ld = 0.1; //TODO add in param.h
+float Ls = 0.0f; //TODO add in param.h
+float La = 0.0; //TODO add in param.h
 
 void main() {
     vec3 col_low = vec3(0, 0.45, 0); //green
@@ -86,6 +86,8 @@ void main() {
 		else
 			discard; //if running the reflection, i don t want to see the sand
     }
+
+
 
     //Compute diffuse shading.
     vec3 dX = dFdx(vpoint_mv.xyz);
