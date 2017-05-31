@@ -18,6 +18,7 @@
 #include "water/water.h"
 #include "param.h"
 #include "glm/ext.hpp"
+#include "bezier.h"
 
 //defines for clearer use of functions in main.cpp
 #define WATER_REFLECTION 1
@@ -30,6 +31,12 @@ Skybox skybox;
 FrameBuffer noise_framebuffer;
 FrameBuffer water_refl;
 Water water;
+
+//bezier variables
+Bezier path;
+Bezier direction;
+bool b_path_start = true;
+float bezier_time = 0;
 
 //initial window dimensions
 int window_width = 800;
@@ -194,6 +201,37 @@ void Display(GLFWwindow* window) {
 
     }
 
+    if(cam_mode == BEZIER) {
+        vec3 position;
+        vec3 cam_direction;
+        vec3 direction_vec;
+        if(b_path_start) {
+            path.clean();
+            direction.clean();
+
+            path.addPoint(vec3(0.0,0.0,0.5));
+            path.addPoint(vec3(0.5,0.5,1.0));
+            path.addPoint(vec3(-0.7,0,0.6));
+            path.addPoint(vec3(0.0, 0.6,1.0));
+            path.addPoint(vec3(0.0, 0.0,0.7));
+            path.addPoint(vec3(0.0, 0.0,1));
+
+            direction.addPoint(vec3(0.3,0.3,0));
+            direction.addPoint(vec3(0.4,0.4,0.4));
+            direction.addPoint(vec3(1,1,0.4));
+            direction.addPoint(vec3(0,0,1));
+
+            b_path_start = false;
+        }
+
+        double time = (int) ((glfwGetTime() - bezier_time)*1000) % BEZIER_LENGTH;
+        double path_time = time/BEZIER_DIVIDER;
+        double dir_time = time/BEZIER_DIVIDER;
+        position = path.bezier_point(path_time);
+        cam_direction = direction.bezier_point(dir_time);
+        view_matrix = lookAt(position, cam_direction, vec3(0.0f, 0.0f, 1.0f));
+    }
+
 
     //a matrix to do the reflection
     mat4 ref = mat4(1);
@@ -203,7 +241,6 @@ void Display(GLFWwindow* window) {
     mat4 mirror_V_matrix = view_matrix * ref;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     noise_framebuffer.Bind();
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -277,6 +314,8 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         case '2' :
             cam_mode = BEZIER;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            b_path_start = true;
+            bezier_time = glfwGetTime();
             break;
         case '3' :
             cam_mode = FIRST_PERSON_SHOOTER;
