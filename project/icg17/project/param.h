@@ -21,3 +21,7 @@
 //trackball
 #define ZOOM_SENSITIVITY 1
 #define ROTATION_SENSITIVITY 1.5f
+
+//bezier
+#define BEZIER_LENGTH 28000
+#define BEZIER_DIVIDER 30000
