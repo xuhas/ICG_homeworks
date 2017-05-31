@@ -36,7 +36,8 @@ Water water;
 Bezier path;
 Bezier direction;
 bool b_path_start = true;
-float bezier_time = 0;
+double bezier_time = 0;
+float bezier_speed = 1;
 
 //initial window dimensions
 int window_width = 800;
@@ -134,6 +135,7 @@ mat4 LookAt(vec3 eye, vec3 center, vec3 up) {
 //initialisation of the program
 void Init() {
     // sets background color
+
     glClearColor(0.9, 0.9, 1.0 /*gray*/, 0.5 /*solid*/);
 
     skybox.Init();
@@ -206,29 +208,36 @@ void Display(GLFWwindow* window) {
     if(cam_mode == BEZIER) {
         vec3 position;
         vec3 cam_direction;
-        vec3 direction_vec;
         if(b_path_start) {
             path.clean();
             direction.clean();
 
-            path.addPoint(vec3(0.0,0.0,0.5));
-            path.addPoint(vec3(0.5,0.5,1.0));
-            path.addPoint(vec3(-0.7,0,0.6));
-            path.addPoint(vec3(0.0, 0.6,1.0));
-            path.addPoint(vec3(0.0, 0.0,0.7));
-            path.addPoint(vec3(0.0, 0.0,1));
+//            path.addPoint(vec3(0.0,0.0,0.5));
+//            path.addPoint(vec3(0.5,0.5,1.0));
+//            path.addPoint(vec3(-0.7,0,0.6));
+//            path.addPoint(vec3(0.0, 0.6,1.0));
+//            path.addPoint(vec3(0.0, 0.0,0.7));
+//            path.addPoint(vec3(0.0, 0.0,1));
 
+//            direction.addPoint(vec3(0.3,0.3,0));
+//            direction.addPoint(vec3(0.4,0.4,0.4));
+//            direction.addPoint(vec3(1,1,0.4));
+//            direction.addPoint(vec3(0,0,1));
+
+            path.addPoint(vec3(0.0,0.0,0.1));
+            path.addPoint(vec3(0.3,0.4,0.2));
+            path.addPoint(vec3(-0.7,0.3,0.3));
+            path.addPoint(vec3(0.0,0.0,0.4));
             direction.addPoint(vec3(0.3,0.3,0));
-            direction.addPoint(vec3(0.4,0.4,0.4));
+            direction.addPoint(vec3(0.4,0.7,0.4));
             direction.addPoint(vec3(1,1,0.4));
             direction.addPoint(vec3(0,0,1));
 
             b_path_start = false;
         }
-
-        double time = (int) ((glfwGetTime() - bezier_time)*1000) % BEZIER_LENGTH;
-        double path_time = time/BEZIER_DIVIDER;
-        double dir_time = time/BEZIER_DIVIDER;
+        bezier_time = (int) (bezier_time + 50 * bezier_speed) % BEZIER_LENGTH;
+        double path_time = bezier_time/BEZIER_DIVIDER;
+        double dir_time = bezier_time/BEZIER_DIVIDER;
         position = path.bezier_point(path_time);
         cam_direction = direction.bezier_point(dir_time);
         view_matrix = lookAt(position, cam_direction, vec3(0.0f, 0.0f, 1.0f));
@@ -237,7 +246,7 @@ void Display(GLFWwindow* window) {
 
     //a matrix to do the reflection
     mat4 ref = mat4(1);
-    ref[2][2]=-3;
+    ref[2][2]=-1;
 
     // create new VP for mirrored camera
     mat4 mirror_V_matrix = view_matrix * ref;
@@ -248,8 +257,10 @@ void Display(GLFWwindow* window) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         noise.Draw(time, IDENTITY_MATRIX, view_matrix, projection_matrix);
         glReadPixels(window_width*(cam_pos[0]+1)/2,window_height*(cam_pos[1]+1)/2,1,1,GL_RED , GL_FLOAT ,&altitude);
+
         //std::cout<<cam_pos[0]<<","<< cam_pos[1]<<","<<cam_pos[2]<<endl;
     }
+
     noise_framebuffer.Unbind();
 
     water_refl.Bind();
@@ -309,29 +320,39 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             pause = !pause;
             stop_time = (float)glfwGetTime();
         }
-
         break;
         //camera mods
     case '1' :
         cam_mode = DEFAULT;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetWindowTitle(window, "ICG Project");
         break;
     case '2' :
         cam_mode = BEZIER;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+        glfwSetWindowTitle(window, "Camera mode : Bezier");
         b_path_start = true;
-        bezier_time = glfwGetTime();
+        bezier_speed = 1;
+        bezier_time = 0;
         break;
     case '3' :
         cam_mode = FIRST_PERSON_SHOOTER;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //cursor disabled
+
+        glfwSetWindowTitle(window, "Camera mode : First Person Shooter");
+
         break;
     case '4' :
         cam_mode = FLY_THROUGH;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //cursor disabled
+
+        glfwSetWindowTitle(window, "Camera mode : Fly Through Mode");
         break;
     case '5' :
         cam_mode = INFINITE_TERRAIN;
+        glfwSetWindowTitle(window, "Camera mode : Infinite Terrain");
+
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         break;
     }
@@ -342,7 +363,19 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         break;
 
     case BEZIER:
+
         /*Bezier curves*/
+
+        if (key == GLFW_KEY_W ) {
+            if(bezier_speed < 5) {
+                bezier_speed += 0.1;
+            }
+        }
+        if (key == GLFW_KEY_S) {
+            if(bezier_speed > 0.20) {
+                bezier_speed -= 0.1;
+            }
+        }
         break;
 
     case FIRST_PERSON_SHOOTER:
@@ -363,6 +396,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
         if (key == GLFW_KEY_D) {
             cam_speed.y += 0.1*PACE;
+
         }
 
         break;
@@ -418,6 +452,7 @@ int main(int argc, char *argv[]) {
         glfwTerminate();
         return EXIT_FAILURE;
     }
+    glfwSetWindowTitle(window, "ICG Project");
 
     // makes the OpenGL context of window current on the calling thread
     glfwMakeContextCurrent(window);
